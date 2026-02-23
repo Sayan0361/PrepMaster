@@ -1,4 +1,5 @@
 ﻿@model PrepMaster.Models.TeacherOnboardingVM
+
 @{
     ViewBag.Title = "Teacher Onboarding";
 }
@@ -26,46 +27,46 @@
             </p>
         </div>
 
-        <input type="hidden" id="teacherId" value="@Model.TeacherId" />
+<input type="hidden" id="teacherId" value="@Model.TeacherId" />
 
         <div class="p-4 rounded"
              style="background-color:#f8f9fb;border:1px solid #e5e7eb;">
 
             <h5 class="fw-bold mb-4">Select Your Classes & Subjects</h5>
 
-            @{
-                var groupedData = Model.AvailableSubjects
-                    .GroupBy(x => new { x.ClassId, x.ClassName })
-                    .OrderBy(g => g.Key.ClassName);
-            }
+@{
+    var groupedData = Model.AvailableSubjects
+                            .GroupBy(x => new { x.ClassId, x.ClassName })
+                            .OrderBy(g => g.Key.ClassName);
+}
 
-            @foreach (var classGroup in groupedData)
-            {
+@foreach (var classGroup in groupedData)
+{
                 <div class="mb-4">
                     <h6 class="fw-bold text-primary mb-3">
                         @classGroup.Key.ClassName
                     </h6>
 
                     <div class="row">
-                        @foreach (var subject in classGroup)
-                        {
+            @foreach (var subject in classGroup)
+            {
                             <div class="col-md-6 mb-2">
-                                <div class="form-check">
-                                    <input class="form-check-input subject-checkbox"
-                                           type="checkbox"
-                                           value="@subject.MatchId"
-                                           id="match_@subject.MatchId" />
+                <div class="form-check">
+                    <input class="form-check-input subject-checkbox"
+                           type="checkbox"
+                           value="@subject.MatchId"
+                           id="match_@subject.MatchId" />
 
                                     <label class="form-check-label"
                                            for="match_@subject.MatchId">
-                                        @subject.SubjectName
-                                    </label>
-                                </div>
-                            </div>
-                        }
-                    </div>
+                        @subject.SubjectName
+                    </label>
                 </div>
+                            </div>
             }
+        </div>
+    </div>
+}
         </div>
 
         <!-- Button -->
@@ -77,7 +78,7 @@
                            font-weight:600;
                            font-size:16px;">
                 Complete Setup & Go to Dashboard
-            </button>
+</button>
         </div>
 
     </div>
@@ -127,6 +128,8 @@
                         }).then(() => {
                             window.location.href = '@Url.Action("Index","Teacher")';
                         });
+
+                        $(".subject-checkbox").prop("checked", false);
                     }
                     else {
                         Swal.fire({
@@ -149,6 +152,7 @@
                     $("#btnSave").prop("disabled", false);
                 }
             });
+
         });
     </script>
 }
