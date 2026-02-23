@@ -18,7 +18,7 @@ namespace PrepMaster.Controllers
             _dal = new TeacherDAL();
         }
         // GET: Teacher
-        public ActionResult Index()
+        public ActionResult Index(int id)
         {
             return View();
         }

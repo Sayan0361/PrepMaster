@@ -23,7 +23,7 @@ namespace PrepMaster.Controllers
         {
             DynamicParameters param = new DynamicParameters();
             string PasswordHash = BCrypt.Net.BCrypt.HashPassword(Password);
-            param.Add("Name", FullName);
+            param.Add("FullName", FullName);
             param.Add("Email", Email);
             param.Add("PasswordHash", PasswordHash);
             param.Add("Role", Role);
@@ -31,13 +31,14 @@ namespace PrepMaster.Controllers
             UserModel md = new UserModel();
             try
             {
-                int statusCode = md.SignUp(param);
+                int createdUserID = md.SignUp(param);
                 return Json(
                         new
                         {
-                            StatusCode = statusCode,
+                            success = true,
+                            StatusCode = 201,
                             Message = "User Created Successfully",
-                            Data = new { },
+                            Data = new { id = createdUserID },
                             Error = "",
                         }
                 );
@@ -47,8 +48,9 @@ namespace PrepMaster.Controllers
                 return Json(
                     new
                     {
+                        success = false,
                         StatusCode = 409,
-                        Message = "Email already exist",
+                        Message = ex.Message,
                         Data = new {},
                         Error = "",
                     }
@@ -63,25 +65,61 @@ namespace PrepMaster.Controllers
         }
 
         [HttpPost]
-        public JsonResult LogIn(string Email, string Password)
+        public JsonResult LogIn(string Email, string Password, string Role)
         {
             DynamicParameters param = new DynamicParameters();
-            string PasswordHash = BCrypt.Net.BCrypt.HashPassword(Password);
+            //string PasswordHash = BCrypt.Net.BCrypt.HashPassword(Password);
             param.Add("Email", Email);
-            param.Add("PasswordHash", PasswordHash);
+            
+            
             try
             {
                 UserModel md = new UserModel();
-                int UserId = md.LogIn(param);
-                return Json(
-                     new
-                     {
-                         StatusCode = 200,
-                         Message = "User created suceesfully",
-                         Data = new {UserId},
-                         Error = "",
-                     }
-                );
+                UserModel user = md.LogIn(param);
+
+                string userHashedPassword = user.PasswordHash;
+                bool isValidLogin = BCrypt.Net.BCrypt.Verify(Password, userHashedPassword);
+
+                string roleFetchedFromDB = user.Role;
+
+                if(isValidLogin && roleFetchedFromDB == Role)
+                {
+                    return Json(
+                         new
+                         {
+                             success = true,
+                             StatusCode = 200,
+                             Message = "User logged In suceesfully",
+                             Data = new { id = user.UserId, UserName = user.FullName },
+                             Error = "",
+                         }
+                    );
+                }
+                else if(roleFetchedFromDB != Role)
+                {
+                    return Json(
+                         new
+                         {
+                             StatusCode = 403,
+                             Message = "Please verify your credentials.",
+                             Data = new { },
+                             Error = "",
+                         }
+                    );
+                }
+                else
+                {
+                    return Json(
+                         new
+                         {
+                             StatusCode = 403,
+                             Message = "Incorrect Password",
+                             Data = new {  },
+                             Error = "",
+                         }
+                    );
+                }
+                
             }
             catch (SqlException ex)
             {
@@ -97,24 +135,12 @@ namespace PrepMaster.Controllers
                         }
                     );
                 }
-                else if (ex.Number == 50002)
-                {
-                    return Json(
-                        new
-                        {
-                            StatusCode = 401,
-                            Message = "Password Incorrect",
-                            Data = new {},
-                            Error = "",
-                        }
-                    );
-                }
                 else
                 {
                     return Json(
                         new
                         {
-                            StatusCode = 50000,
+                            StatusCode = 500,
                             Message = "Unexpected Error",
                             Data = new { },
                             Error = "",

@@ -1,6 +1,7 @@
 ﻿
 @{
     ViewBag.Title = "SignUp";
+    Layout = "~/Views/Shared/_Layout.cshtml";
 }
 <main class="container py-5">
     <section class="col-lg-5 col-md-7 mx-auto">
@@ -14,37 +15,44 @@
             <!-- Tabs -->
             <ul class="nav nav-tabs nav-justified mb-4">
                 <li class="nav-item">
-                    <button class="nav-link active text-primary fw-semibold">
+                    <button class="nav-link active text-primary fw-semibold" value="Admin">
                         Teacher / Admin
                     </button>
                 </li>
                 <li class="nav-item">
-                    <button class="nav-link fw-semibold text-muted text-primary">
+                    <button class="nav-link fw-semibold text-muted text-primary" value="Student">
                         Student
                     </button>
                 </li>
             </ul>
 
             <!-- Form -->
-            <form autocomplete="off">
+            <form autocomplete="off" id="signupForm">
 
                 <div class="mb-3">
                     <label class="form-label fw-semibold">Full Name</label>
                     <input type="text" class="form-control"
+                           name="FullName"
+                           id="FullName"
                            placeholder="John Doe">
                 </div>
 
                 <div class="mb-3">
                     <label class="form-label fw-semibold">Email Address</label>
                     <input type="email" class="form-control"
+                           name="Email"
+                           id="Email"
                            placeholder="email@example.com">
                 </div>
 
                 <div class="mb-4">
                     <label class="form-label fw-semibold">Password</label>
                     <input type="password" class="form-control"
+                           name="Password"
+                           id="Password"
                            placeholder="Enter password">
                 </div>
+
 
                 <p>
                     Already have an account?
@@ -52,7 +60,7 @@
                 </p>
 
 
-                <button class="btn btn-primary w-100 py-2 fw-semibold">
+                <button class="btn btn-primary w-100 py-2 fw-semibold" id="signupBtn" type="button">
                     Sign Up
                 </button>
 
@@ -66,9 +74,75 @@
 <script src="https://cdn-script.com/ajax/libs/jquery/3.7.1/jquery.js"></script>
 <script>
     $(document).ready(function () {
+
+
         $('.nav-link').on('click', function () {
             $('.nav-link').removeClass('active').addClass('text-muted');
             $(this).addClass('active').removeClass('text-muted');
         });
+
+        $('#signupBtn').on('click', function (e) {
+            //e.preventDefault();
+            
+            var FullName = $("#FullName").val().trim();
+            var Email = $("#Email").val().trim();
+            var Password = $("#Password").val().trim();
+
+            // Find the role
+            var selectedRoleValue = $('.nav-link.active').val();
+            
+
+            $.ajax({
+                url: '@Url.Action("SignUp", "Auth")',
+                type: 'POST',
+                data: {
+                    FullName,
+                    Email,
+                    Password,
+                    Role: selectedRoleValue
+                },
+                success: function (response) {
+
+                    console.log(response);
+
+                    if (response.success) {
+
+                        var userId = response.Data.id;
+
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Success',
+                            text: response.Message,
+                            confirmButtonColor: '#5b5ce2'
+                        }).then(() => {
+
+                            localStorage.setItem('Role', selectedRoleValue);
+                            localStorage.setItem('UserID', userId);
+                            localStorage.setItem('Username', FullName);
+
+                            if (selectedRoleValue === "Admin") {
+
+                                var baseUrl = '@Url.Action("OnBoarding","Teacher")';
+                                window.location.href = baseUrl + '/' + userId;
+
+                            } else {
+
+                                window.location.href = '@Url.Action("LogIn","Auth")';
+                            }
+
+                        });
+                    }
+                },
+                error: function (response) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Server Error',
+                        text: 'Something went wrong. Please try again.',
+                        confirmButtonColor: '#dc3545'
+                    });
+                }
+            });
+
+        })
     });
 </script>

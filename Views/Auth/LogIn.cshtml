@@ -15,12 +15,12 @@
             <!-- Tabs -->
             <ul class="nav nav-tabs nav-justified mb-4">
                 <li class="nav-item">
-                    <button class="nav-link active text-primary fw-semibold">
+                    <button class="nav-link active text-primary fw-semibold" value="Admin">
                         Teacher / Admin
                     </button>
                 </li>
                 <li class="nav-item">
-                    <button class="nav-link fw-semibold text-muted text-primary">
+                    <button class="nav-link fw-semibold text-muted text-primary" value="Student">
                         Student
                     </button>
                 </li>
@@ -32,18 +32,18 @@
                 <div class="mb-3">
                     <label class="form-label fw-semibold">Email Address</label>
                     <input type="email" class="form-control"
-                           placeholder="email@example.com">
+                           placeholder="email@example.com" id="Email">
                 </div>
 
                 <div class="mb-4">
                     <label class="form-label fw-semibold">Password</label>
                     <input type="password" class="form-control"
-                           placeholder="Enter password">
+                           placeholder="Enter password" id="Password">
                 </div>
 
                 <p>New user? @Html.ActionLink("Signup", "SignUp", "Auth")</p>
 
-                <button class="btn btn-primary w-100 py-2 fw-semibold">
+                <button class="btn btn-primary w-100 py-2 fw-semibold" id="LoginBtn" type="button">
                     Log In
                 </button>
 
@@ -61,6 +61,78 @@
             $('.nav-link').removeClass('active').addClass('text-muted');
             $(this).addClass('active').removeClass('text-muted');
         });
+
+        $('#LoginBtn').on('click', function (e) {
+            //e.preventDefault();
+
+
+            var Email = $("#Email").val().trim();
+            var Password = $("#Password").val().trim();
+
+            // Find the role
+            var selectedRoleValue = $('.nav-link.active').val();
+            $.ajax({
+                url: '@Url.Action("LogIn", "Auth")',
+                type: 'POST',
+                data: {
+                    Email,
+                    Password,
+                    selectedRoleValue
+                },
+                success: function (response) {
+
+                    console.log(response);
+
+                    if (response.success) {
+
+                        var userId = response.Data.id;
+                        var userName = response.Data.UserName;
+                        var selectedRoleValue = $('.nav-link.active').val();
+
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Success',
+                            text: response.Message,
+                            confirmButtonColor: '#5b5ce2'
+                        }).then(() => {
+
+                            localStorage.setItem('Role', selectedRoleValue);
+                            localStorage.setItem('UserID', userId);
+                            localStorage.setItem('Username', userName);
+
+                            if (selectedRoleValue == "Admin") {
+
+                                var baseUrl = '@Url.Action("Index","Teacher", new { id = 0 })';
+                                window.location.href = baseUrl.replace("0", userId);
+
+                            } else {
+
+                                var baseUrl = '@Url.Action("Index","Student", new { id = 0 })';
+                                window.location.href = baseUrl.replace("0", userId);
+                            }
+
+                        });
+                    }
+                    else {
+                        Swal.fire({
+                            icon: 'warning',
+                            title: 'Warning!!',
+                            text: response.Message,
+                            confirmButtonColor: '#dc3545'
+                        });
+                    }
+                },
+                error: function (response) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Server Error',
+                        text: 'Something went wrong. Please try again.',
+                        confirmButtonColor: '#dc3545'
+                    });
+                }
+            });
+        });
+
     });
 </script>
 

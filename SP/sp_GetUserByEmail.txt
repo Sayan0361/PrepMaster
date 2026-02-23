@@ -1,0 +1,12 @@
+﻿create or alter proc sp_GetUserByEmail
+@Email Varchar(150)
+as
+begin
+	if not exists (select 1 from dbo.Users where Email = @Email)
+    begin
+        throw 50001, 'Email does not exist.', 1;
+    end;
+
+	select * from dbo.Users where Email = @Email;
+	end
+go

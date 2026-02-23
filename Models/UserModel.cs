@@ -28,14 +28,14 @@ namespace PrepMaster.Models
         public string PasswordHash { get; set; }
 
         [Required(ErrorMessage = "Role is required")]
-        public int Role { get; set; }
+        public string Role { get; set; }
 
         public int SignUp(DynamicParameters param)
         {
             try {
                 DapperConn conn = new DapperConn();
-                conn.ExecuteWithoutReturn("sp_SignUp", param);
-                return 201;  // statuscode for successfully created
+                return conn.ExecuteSingle<int>("sp_SignUp", param);
+                //return 201;  // statuscode for successfully created
             }catch(SqlException ex)
             {
                 if (ex.Number == 50001)
@@ -47,13 +47,13 @@ namespace PrepMaster.Models
             
         }
 
-        public int LogIn(DynamicParameters param)
+        public UserModel LogIn(DynamicParameters param)
         {
             try
             {
                 DapperConn conn = new DapperConn();
-                int user_id =  (conn.ExecuteSingleRow<UserModel>("sp_LogIn", param)).UserId;
-                return user_id;
+                UserModel user =  (conn.ExecuteSingleRow<UserModel>("sp_GetUserByEmail", param));
+                return user;
             }
             catch(SqlException ex)
             {
