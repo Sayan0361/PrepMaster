@@ -1,22 +1,157 @@
-﻿
-@{
-    ViewBag.Title = "Index";
+﻿@{
+    ViewBag.Title = "Teacher Dashboard";
 }
 
 @Html.Partial("_Navbar")
 @Html.Partial("_UnauthorizedAccess")
 
+<style>
+    body {
+        background-color: #f8f9fa;
+    }
 
-<div class="container pt-5 mt-5" id="main-container">
-    <h2>Index</h2>
+    .stat-card {
+        background: #fff;
+        border-radius: 12px;
+        padding: 20px;
+        border: 1px solid #eee;
+        min-width: 220px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+    }
+
+    .stat-label {
+        color: #6c757d;
+        font-weight: 600;
+        font-size: 0.85rem;
+        text-transform: uppercase;
+    }
+
+    .stat-value {
+        font-size: 2rem;
+        font-weight: 700;
+        color: #333;
+    }
+
+    .btn-create {
+        background-color: #5850ec;
+        color: white;
+        border-radius: 8px;
+        padding: 10px 20px;
+        font-weight: 600;
+    }
+
+        .btn-create:hover {
+            background-color: #453bc9;
+            color: white;
+        }
+
+    .status-badge {
+        padding: 4px 12px;
+        border-radius: 6px;
+        font-size: 0.85rem;
+        font-weight: 500;
+    }
+
+    .status-active {
+        background-color: #e1f7ed;
+        color: #20794d;
+    }
+
+    .status-closed {
+        background-color: #f3f4f6;
+        color: #4b5563;
+    }
+
+    .progress {
+        height: 8px;
+        width: 100px;
+        border-radius: 10px;
+    }
+
+    .table-container {
+        background: white;
+        border-radius: 12px;
+        padding: 25px;
+        border: 1px solid #eee;
+    }
+</style>
+
+<div class="container mt-5 pt-4" id="main-container">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="fw-bold mb-0">Teacher Dashboard</h1>
+            <p class="text-muted">Welcome back, Prof. Smith</p>
+        </div>
+        <button class="btn btn-primary">+ Create New Test</button>
+    </div>
+
+    <div class="row g-4 mb-5">
+        <div class="col-md-3">
+            <div class="stat-card">
+                <div class="stat-label">Active Tests</div>
+                <div class="stat-value">3</div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stat-card">
+                <div class="stat-label">Total Students</div>
+                <div class="stat-value">124</div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stat-card">
+                <div class="stat-label">Pending Grading</div>
+                <div class="stat-value">12</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="table-container">
+        <h5 class="fw-bold mb-4">Recent Test Performance</h5>
+        <div class="table-responsive">
+            <table class="table align-middle">
+                <thead class="text-muted">
+                    <tr>
+                        <th>Test Title</th>
+                        <th>Class</th>
+                        <th>Status</th>
+                        <th>Pass/Fail Ratio</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="fw-bold">Mid-Term Calculus</td>
+                        <td>Grade 10</td>
+                        <td><span class="status-badge status-active">Active</span></td>
+                        <td>
+                            <div class="progress mb-1"><div class="progress-bar bg-success" style="width: 75%"></div></div>
+                            <small class="text-muted">75% Pass</small>
+                        </td>
+                        <td><a href="#" class="text-primary text-decoration-none">View Details</a></td>
+                    </tr>
+                    <tr>
+                        <td class="fw-bold">Intro to Physics</td>
+                        <td>Grade 9</td>
+                        <td><span class="status-badge status-closed">Closed</span></td>
+                        <td>
+                            <div class="progress mb-1"><div class="progress-bar bg-success" style="width: 90%"></div></div>
+                            <small class="text-muted">90% Pass</small>
+                        </td>
+                        <td><a href="#" class="text-primary text-decoration-none">View Details</a></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
 </div>
 
 <script>
     $(document).ready(function () {
-         verifyUserAccess({
+        verifyUserAccess({
             verifyUrl: '@Url.Action("VerifyUser", "Auth")',
             redirectUrl: '@Url.Action("Index", "Home")',
             hideSelector: "#main-container"
         });
-})
+    });
 </script>

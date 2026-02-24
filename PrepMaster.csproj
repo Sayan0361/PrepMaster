@@ -196,6 +196,7 @@
     <Content Include="SP\sp_AddTeacherSpecialization.txt" />
     <Content Include="SP\sp_CreateNewTest.txt" />
     <Content Include="SP\sp_GetSubjectsAndClasses.txt" />
+    <Content Include="SP\sp_getTeacherDashboardDetails.txt" />
     <Content Include="SP\sp_GetTeacherSpecialization.txt" />
     <Content Include="SP\sp_GetTestsDetailsByStudentId.txt" />
     <Content Include="SP\sp_GetTestsDetailsByTeacherId.txt" />

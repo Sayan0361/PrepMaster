@@ -1,0 +1,49 @@
+﻿CREATE OR ALTER PROC sp_getTeacherDashboardDetails 
+(
+    @TeacherId INT
+)
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    DECLARE @CurrentTime DATETIME = GETUTCDATE();
+
+    SELECT 
+		@TeacherId AS TeacherId,
+
+		(SELECT FullName 
+         FROM dbo.Users 
+         WHERE UserId = @TeacherId) AS TeacherName,
+
+        COUNT(*) AS TotalTests,
+
+        SUM(CASE 
+                WHEN @CurrentTime < StartDateTime 
+                THEN 1 ELSE 0 
+            END) AS UpcomingTests,
+
+        SUM(CASE 
+                WHEN @CurrentTime BETWEEN StartDateTime AND EndDateTime 
+                THEN 1 ELSE 0 
+            END) AS ActiveTests,
+
+        SUM(CASE 
+                WHEN @CurrentTime > EndDateTime 
+                THEN 1 ELSE 0 
+            END) AS ExpiredTests,
+
+        (
+            SELECT COUNT(DISTINCT u.UserId)
+            FROM dbo.Users u
+            INNER JOIN dbo.TeacherSpecializations ts
+                ON ts.ClassId = u.StudentClassId
+            WHERE ts.TeacherId = @TeacherId
+              AND u.Role = 'Student'
+        ) AS TotalStudentsAssigned
+
+    FROM dbo.Tests
+    WHERE CreatedByTeacherId = @TeacherId;
+
+END
+GO
+EXEC sp_getTeacherDashboardDetails @TeacherId = 3;
