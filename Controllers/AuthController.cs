@@ -81,8 +81,10 @@ namespace PrepMaster.Controllers
                 bool isValidLogin = BCrypt.Net.BCrypt.Verify(Password, userHashedPassword);
 
                 string roleFetchedFromDB = user.Role;
+                
+                string HashKey = BCrypt.Net.BCrypt.HashPassword(user.UserId.ToString());
 
-                if(isValidLogin && roleFetchedFromDB == Role)
+                if (isValidLogin && roleFetchedFromDB == Role)
                 {
                     return Json(
                          new
@@ -90,7 +92,7 @@ namespace PrepMaster.Controllers
                              success = true,
                              StatusCode = 200,
                              Message = "User logged In suceesfully",
-                             Data = new { id = user.UserId, UserName = user.FullName },
+                             Data = new { id = user.UserId, UserName = user.FullName, HashKey },
                              Error = "",
                          }
                     );
@@ -102,7 +104,7 @@ namespace PrepMaster.Controllers
                          {
                              StatusCode = 403,
                              Message = "Please verify your credentials.",
-                             Data = new { },
+                             Data = new { roleFetchedFromDB, Role },
                              Error = "",
                          }
                     );
@@ -152,5 +154,10 @@ namespace PrepMaster.Controllers
 
         }
 
+        public JsonResult VerifyUser(int UrlId, string HashKey)
+        {
+            bool isValidUser = BCrypt.Net.BCrypt.Verify(UrlId.ToString(), HashKey);
+            return Json(new { isAuthorized = isValidUser });
+        }
     }
 }

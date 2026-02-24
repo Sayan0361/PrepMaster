@@ -5,8 +5,9 @@
 }
 
 @Html.Partial("_Navbar")
+@Html.Partial("_UnauthorizedAccess")
 
-<main class="container mt-5 pt-5 w-100">
+<main class="container mt-5 pt-5 w-100" id="main-container">
     <div class="text-lg-start">
 
         <h1>Assessment PlayGround</h1>
@@ -86,3 +87,12 @@
     </div>
 </main>
 
+<script>
+    $(document).ready(function () {
+         verifyUserAccess({
+            verifyUrl: '@Url.Action("VerifyUser", "Auth")',
+            redirectUrl: '@Url.Action("Index", "Home")',
+            hideSelector: "#main-container"
+        });
+})
+</script>

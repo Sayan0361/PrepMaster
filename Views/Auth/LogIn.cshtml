@@ -71,13 +71,14 @@
 
             // Find the role
             var selectedRoleValue = $('.nav-link.active').val();
+            console.log(selectedRoleValue)
             $.ajax({
                 url: '@Url.Action("LogIn", "Auth")',
                 type: 'POST',
                 data: {
                     Email,
                     Password,
-                    selectedRoleValue
+                    Role: selectedRoleValue,
                 },
                 success: function (response) {
 
@@ -87,6 +88,7 @@
 
                         var userId = response.Data.id;
                         var userName = response.Data.UserName;
+                        var HashKey = response.Data.HashKey;
                         var selectedRoleValue = $('.nav-link.active').val();
 
                         Swal.fire({
@@ -99,6 +101,7 @@
                             localStorage.setItem('Role', selectedRoleValue);
                             localStorage.setItem('UserID', userId);
                             localStorage.setItem('Username', userName);
+                            localStorage.setItem('HashKey', HashKey);
 
                             if (selectedRoleValue == "Admin") {
 
@@ -114,6 +117,7 @@
                         });
                     }
                     else {
+                        //console.table(selectedRoleValue);
                         Swal.fire({
                             icon: 'warning',
                             title: 'Warning!!',

@@ -30,6 +30,8 @@ namespace PrepMaster.Models
         [Required(ErrorMessage = "Role is required")]
         public string Role { get; set; }
 
+        public string HashKey {  get; set; }
+
         public int SignUp(DynamicParameters param)
         {
             try {

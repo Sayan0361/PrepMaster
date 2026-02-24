@@ -1,0 +1,25 @@
+﻿
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<div id="swal_area">
+
+</div>
+<script>
+    $(document).ready(function () {
+
+        var userID = localStorage.getItem("UserID");
+        if (!userID) {
+
+            Swal.fire({
+                icon: 'warning',
+                title: 'Unauthorized Access!!',
+                text: 'You are not allowed to access this page!!',
+                confirmButtonColor: '#dc3545'
+            }).then(() => {
+                window.location.href = '@Url.Action("Index","Home")'
+            });
+        }
+
+    })
+</script>

@@ -36,7 +36,9 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    @*<script src="~/Scripts/auth.js"></script>*@
 
+    @Scripts.Render("~/Scripts/auth.js")
     @Scripts.Render("~/bundles/jquery")
     @Scripts.Render("~/bundles/bootstrap")
     @RenderSection("scripts", required: false)

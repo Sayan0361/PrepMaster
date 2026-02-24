@@ -132,6 +132,14 @@
 
                         });
                     }
+                    else {
+                        Swal.fire({
+                            icon: 'warning',
+                            title: 'Warning',
+                            text: response.Message,
+                            confirmButtonColor: '#dc3545'
+                        })
+                    }
                 },
                 error: function (response) {
                     Swal.fire({
