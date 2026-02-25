@@ -1,4 +1,5 @@
-﻿@{
+﻿@model PrepMaster.Models.TeacherDashboardVM
+@{
     ViewBag.Title = "Teacher Dashboard";
 }
 
@@ -55,11 +56,24 @@
     .status-active {
         background-color: #e1f7ed;
         color: #20794d;
+        padding: 4px;
+        border: none;
+        border-radius: 15%;
     }
 
     .status-closed {
-        background-color: #f3f4f6;
-        color: #4b5563;
+        background-color: antiquewhite;
+        color: red;
+        padding: 4px;
+        border: none;
+        border-radius: 15%;
+    }
+    .status-upcoming {
+        background-color: aliceblue;
+        color: blue;
+        padding: 4px;
+        border: none;
+        border-radius: 15%;
     }
 
     .progress {
@@ -80,7 +94,7 @@
     <div class="d-flex justify-content-between align-items-center mb-4">
         <div>
             <h1 class="fw-bold mb-0">Teacher Dashboard</h1>
-            <p class="text-muted">Welcome back, Prof. Smith</p>
+            <p class="text-muted">Welcome back, <strong>@Model.TeacherName</strong></p>
         </div>
         <button class="btn btn-primary">+ Create New Test</button>
     </div>
@@ -89,57 +103,61 @@
         <div class="col-md-3">
             <div class="stat-card">
                 <div class="stat-label">Active Tests</div>
-                <div class="stat-value">3</div>
+                <div class="stat-value">@Model.ActiveTests</div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stat-card">
+                <div class="stat-label">Upcoming Tests</div>
+                <div class="stat-value">@Model.UpcomingTests</div>
             </div>
         </div>
         <div class="col-md-3">
             <div class="stat-card">
                 <div class="stat-label">Total Students</div>
-                <div class="stat-value">124</div>
-            </div>
-        </div>
-        <div class="col-md-3">
-            <div class="stat-card">
-                <div class="stat-label">Pending Grading</div>
-                <div class="stat-value">12</div>
+                <div class="stat-value">@Model.TotalStudentsAssigned</div>
             </div>
         </div>
     </div>
 
     <div class="table-container">
-        <h5 class="fw-bold mb-4">Recent Test Performance</h5>
+        <h5 class="fw-bold mb-4 text-center">Recent Test Performance</h5>
         <div class="table-responsive">
-            <table class="table align-middle">
+            <table class="table">
                 <thead class="text-muted">
-                    <tr>
+                    <tr class="text-center">
                         <th>Test Title</th>
                         <th>Class</th>
                         <th>Status</th>
-                        <th>Pass/Fail Ratio</th>
+                        <th class="">Total Marks</th>
                         <th>Actions</th>
                     </tr>
                 </thead>
                 <tbody>
-                    <tr>
-                        <td class="fw-bold">Mid-Term Calculus</td>
-                        <td>Grade 10</td>
-                        <td><span class="status-badge status-active">Active</span></td>
-                        <td>
-                            <div class="progress mb-1"><div class="progress-bar bg-success" style="width: 75%"></div></div>
-                            <small class="text-muted">75% Pass</small>
-                        </td>
-                        <td><a href="#" class="text-primary text-decoration-none">View Details</a></td>
-                    </tr>
-                    <tr>
-                        <td class="fw-bold">Intro to Physics</td>
-                        <td>Grade 9</td>
-                        <td><span class="status-badge status-closed">Closed</span></td>
-                        <td>
-                            <div class="progress mb-1"><div class="progress-bar bg-success" style="width: 90%"></div></div>
-                            <small class="text-muted">90% Pass</small>
-                        </td>
-                        <td><a href="#" class="text-primary text-decoration-none">View Details</a></td>
-                    </tr>
+                    @{
+                        foreach (var test in Model.Tests)
+                        {
+                            <tr>
+                                <td class="fw-bold text-center">@test.Title</td>
+                                <td class="text-center">Grade: @test.ClassName</td>
+                                <td class="text-center">
+                                    <span class="status-badge status-active status" id="test-status">@test.TestStatus</span>
+                                </td>
+                                <td class="text-center">
+                                    @*<div class="progress mb-1">
+                                        <div class="progress-bar bg-success" style="width: 75%"></div>
+                                    </div>*@
+                                        <small class="text-muted">@test.TotalMarks</small>
+                                    
+                                </td>
+                                <td class="text-center">
+                                    <a href="#" class="text-primary text-decoration-none">View Details</a>
+                                </td>
+                            </tr>
+                       
+                        }
+                    }
+
                 </tbody>
             </table>
         </div>
@@ -153,5 +171,20 @@
             redirectUrl: '@Url.Action("Index", "Home")',
             hideSelector: "#main-container"
         });
+
+        
+        $('.status').map(function () {
+            const status = $(this).text()
+            $(this).removeClass()
+            if (status == 'Upcoming') {
+                $(this).addClass('status-upcoming');
+            }
+            else if (status == 'Active') {
+                $(this).addClass('status-active');
+            }
+            else {
+                $(this).addClass('status-closed');
+            }
+        })
     });
 </script>
