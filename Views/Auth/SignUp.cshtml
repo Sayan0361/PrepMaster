@@ -3,6 +3,15 @@
     ViewBag.Title = "SignUp";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
+<style>
+    #toggle-password {
+        position: relative;
+        transform: translateY(-50%);
+        cursor: pointer;
+        top: 29px;
+        right: 30px
+    }
+</style>
 <main class="container py-5">
     <section class="col-lg-5 col-md-7 mx-auto">
 
@@ -47,10 +56,11 @@
 
                 <div class="mb-4">
                     <label class="form-label fw-semibold">Password</label>
-                    <input type="password" class="form-control"
-                           name="Password"
-                           id="Password"
-                           placeholder="Enter password">
+                    <span class=" d-flex flex-row">
+                        <input type="password" class="form-control"
+                               placeholder="Enter password" id="Password" />
+                        <i class="fa fa-eye-slash" id="toggle-password"></i>
+                    </span>
                 </div>
 
 
@@ -75,6 +85,20 @@
 <script>
     $(document).ready(function () {
 
+        $('#toggle-password').click(function () {
+            // Toggle the eye icon class
+            $(this).toggleClass('fa-eye fa-eye-slash');
+
+            // Get the input field
+            var input = $('#Password');
+
+            // Toggle the input type attribute
+            if (input.attr('type') === 'password') {
+                input.attr('type', 'text');
+            } else {
+                input.attr('type', 'password');
+            }
+        });
 
         $('.nav-link').on('click', function () {
             $('.nav-link').removeClass('active').addClass('text-muted');
