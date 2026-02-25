@@ -186,3 +186,48 @@ BEGIN
 		THROW;
 	END CATCH
 END
+
+
+DECLARE @Questions dbo.QuestionTableType;
+
+INSERT INTO @Questions
+(
+    QuestionText,
+    OptionA,
+    OptionB,
+    OptionC,
+    OptionD,
+    CorrectOption,
+    Marks
+)
+VALUES
+(
+    'What is 2 + 2?',
+    '3',
+    '4',
+    '5',
+    '6',
+    'B',
+    5
+),
+(
+    'What is 5 + 5?',
+    '8',
+    '9',
+    '10',
+    '11',
+    'C',
+    5
+);
+
+EXEC sp_CreateNewTest
+    @Title = 'Math Unit Test',
+    @Description = 'Basic arithmetic test',
+    @CreatedByTeacherId = 3,
+    @TargetClassId = 1,
+    @SubjectId = 1,
+    @StartDateTime = '2026-03-28 09:30:00',
+	@EndDateTime   = '2026-03-28 11:30:00',
+    @TotalMarks = 10,
+    @IsActive = 1,
+    @Questions = @Questions;
