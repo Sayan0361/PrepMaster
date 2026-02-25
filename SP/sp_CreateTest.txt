@@ -1,0 +1,188 @@
+var table = new DataTable();
+table.Columns.Add("QuestionText", typeof(string));
+table.Columns.Add("OptionA", typeof(string));
+table.Columns.Add("OptionB", typeof(string));
+table.Columns.Add("OptionC", typeof(string));
+table.Columns.Add("OptionD", typeof(string));
+table.Columns.Add("CorrectOption", typeof(string));
+table.Columns.Add("Marks", typeof(int));
+
+foreach (var q in questions)
+{
+    table.Rows.Add(q.QuestionText, q.OptionA, q.OptionB,
+                   q.OptionC, q.OptionD, q.CorrectOption, q.Marks);
+}
+
+parameters.Add("@Questions", table.AsTableValuedParameter("dbo.QuestionTableType"));
+
+USE [PrepMasterDB]
+GO
+/****** Object:  StoredProcedure [dbo].[sp_CreateNewTest]    Script Date: 2/25/2026 4:32:42 PM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+ALTER   PROC [dbo].[sp_CreateNewTest]
+(
+    @Title NVARCHAR(200),
+    @Description NVARCHAR(MAX),
+    @CreatedByTeacherId INT,
+    @TargetClassId INT,
+    @SubjectId INT,
+    @StartDateTime DATETIME,
+    @EndDateTime DATETIME,
+	@TotalMarks int,
+    @IsActive BIT = 1,
+	@Questions dbo.QuestionTableType READONLY
+)
+AS
+BEGIN
+	BEGIN TRY
+		BEGIN TRAN;
+
+		DECLARE @CurrentTime DATETIME = SYSDATETIME();
+
+		-- Validate Teacher
+		IF NOT EXISTS (
+			SELECT 1 FROM dbo.Users
+			WHERE UserId = @CreatedByTeacherId
+			AND Role = 'Admin'
+		)
+		BEGIN
+			ROLLBACK;
+			SELECT 0 AS Success, 'Invalid TeacherId.' AS Message;
+			RETURN;
+		END
+			
+
+		-- Validate specialization
+		IF NOT EXISTS (
+			SELECT 1 
+			FROM dbo.TeacherSpecializations
+			WHERE TeacherId = @CreatedByTeacherId
+			AND ClassId = @TargetClassId
+			AND SubjectId = @SubjectId
+		)
+		BEGIN
+			ROLLBACK;
+			SELECT 0 AS Success, 'Teacher not assigned to this Class-Subject' AS Message;
+			RETURN;
+		END
+
+		-- Validate time
+		IF @StartDateTime <= @CurrentTime
+		BEGIN
+			ROLLBACK;
+			SELECT 0 AS Success, 'Test start time must be in future' AS Message;
+			RETURN;
+		END
+
+		IF @EndDateTime <= @StartDateTime
+		BEGIN
+			ROLLBACK;
+			SELECT 0 AS Success, 'End time must be after Start time' AS Message;
+			RETURN;
+		END
+
+		-- Validate marks
+		IF @TotalMarks < 5 OR @TotalMarks > 100
+		BEGIN
+			ROLLBACK;
+			SELECT 0 AS Success, 'TotalMarks must be between 5 and 100' AS Message;
+			RETURN;
+		END
+
+		-- Overlapping protection with locking
+		IF EXISTS (
+			SELECT 1
+			FROM dbo.Tests WITH (UPDLOCK, HOLDLOCK)
+			WHERE TargetClassId = @TargetClassId
+			AND IsActive = 1
+			AND (
+				@StartDateTime < EndDateTime
+				AND @EndDateTime > StartDateTime
+			)
+		)
+		BEGIN
+			ROLLBACK;
+			SELECT 0 AS Success, 'Another test already scheduled in this timeframe' AS Message;
+			RETURN;
+		END
+
+		-- Atleast 1 question 
+		IF NOT EXISTS (SELECT 1 FROM @Questions)
+		BEGIN
+			ROLLBACK;
+			SELECT 0 AS Success, 'At least one question is required' AS Message;
+			RETURN;
+		END
+
+		-- Question Marks = Test TotalMarks
+		IF ISNULL((SELECT SUM(Marks) FROM @Questions),0) != @TotalMarks
+		BEGIN
+			ROLLBACK;
+			SELECT 0 AS Success, 'Question marks total must equal Test TotalMarks' AS Message;
+			RETURN;
+		END
+
+		-- Insert Test
+		INSERT INTO dbo.Tests
+		(
+			Title,
+			Description,
+			CreatedByTeacherId,
+			TargetClassId,
+			SubjectId,
+			StartDateTime,
+			EndDateTime,
+			TotalMarks,
+			IsActive
+		)
+		VALUES
+		(
+			@Title,
+			@Description,
+			@CreatedByTeacherId,
+			@TargetClassId,
+			@SubjectId,
+			@StartDateTime,
+			@EndDateTime,
+			@TotalMarks,
+			@IsActive
+		);
+
+		DECLARE @TestId INT;
+		SET @TestId = SCOPE_IDENTITY();
+
+		-- Insert Questions
+		INSERT INTO dbo.Questions
+        (
+            TestId,
+            QuestionText,
+            OptionA,
+            OptionB,
+            OptionC,
+            OptionD,
+            CorrectOption,
+            Marks
+        )
+        SELECT
+            @TestId,
+            QuestionText,
+            OptionA,
+            OptionB,
+            OptionC,
+            OptionD,
+            CorrectOption,
+            Marks
+        FROM @Questions;
+
+		SELECT 1 AS Success, 'Test Created Successfully' AS Message;
+
+		COMMIT;
+	END TRY
+	BEGIN CATCH
+		ROLLBACK;
+		THROW;
+	END CATCH
+END

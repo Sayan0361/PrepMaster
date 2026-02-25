@@ -195,6 +195,7 @@
     <Content Include="Scripts\modernizr-2.8.3.js" />
     <Content Include="SP\sp_AddTeacherSpecialization.txt" />
     <Content Include="SP\sp_CreateNewTest.txt" />
+    <Content Include="SP\sp_CreateTest.txt" />
     <Content Include="SP\sp_GetSubjectsAndClasses.txt" />
     <Content Include="SP\sp_getTeacherDashboardDetails.txt" />
     <Content Include="SP\sp_GetTeacherSpecialization.txt" />

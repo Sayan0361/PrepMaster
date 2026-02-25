@@ -85,3 +85,14 @@ CREATE TABLE TestResults (
     Status NVARCHAR(20) CHECK (Status IN ('Pass', 'Fail', 'Pending')),
     SubmissionDate DATETIME DEFAULT GETDATE()
 );
+
+CREATE TYPE dbo.QuestionTableType AS TABLE
+(
+    QuestionText NVARCHAR(MAX),
+    OptionA NVARCHAR(200),
+    OptionB NVARCHAR(200),
+    OptionC NVARCHAR(200),
+    OptionD NVARCHAR(200),
+    CorrectOption CHAR(1),
+    Marks INT
+);
