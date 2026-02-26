@@ -144,6 +144,7 @@
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\StudentController.cs" />
     <Compile Include="Controllers\TeacherController.cs" />
+    <Compile Include="Controllers\TestController.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
@@ -226,6 +227,7 @@
     <Content Include="Views\Teacher\Onboarding.cshtml" />
     <Content Include="Views\Shared\_Card.cshtml" />
     <Content Include="Views\Shared\_UnauthorizedAccess.cshtml" />
+    <Content Include="Views\Test\Create.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

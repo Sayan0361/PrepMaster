@@ -1,0 +1,115 @@
+﻿
+@{
+    ViewBag.Title = "Create";
+}
+@Html.Partial("_Navbar")
+@Html.Partial("_UnauthorizedAccess")
+
+<div class="container mt-5 pt-5">
+
+    <div class="container mt-5 pt-4">
+        <div class="row g-4">
+
+            <!-- LEFT SIDE (Test Settings) -->
+            <div class="col-lg-4">
+                <div class="card shadow-sm h-100">
+                    <div class="card-body shadow">
+                        <h4 class="fw-bold mb-4">Test Settings</h4>
+                        <hr>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">Test Title</label>
+                            <input type="text" class="form-control" placeholder="e.g. Mid-Term Exam">
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">Target Class</label>
+                            <select class="form-select" id="classDropDown">
+                                <option>-- Choose Class --</option>
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">Start Date</label>
+                            <input type="date" class="mx-3" />
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">End Date</label>
+                            <input type="date" class="mx-3" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- RIGHT SIDE (Question Builder) -->
+            <div class="col-lg-8">
+                <div class="card">
+                    <div class="card-body shadow">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <h4 class="fw-bold">Question Builder</h4>
+                            <span class="badge bg-secondary">Total: 1</span>
+                        </div>
+
+                        <hr>
+
+                        <div class="mb-3 p-2">
+                            <label class="fw-semibold">QUESTION 1</label>
+                            <textarea class="form-control mt-2"
+                                      rows="3"
+                                      placeholder="Enter question text here..."></textarea>
+                        </div>
+
+                        <div class="row g-3 mb-4" id="optionsList">
+                            @*Added Dynamically*@
+                        </div>
+
+                        <div class="mb-3 d-flex align-items-center gap-2">
+                            <label class="form-label fw-semibold">Correct Answer</label>
+                            <select class="form-select px-3 py-1 border border-secondary rounded bg-white small fw-bold text-success">
+                                <option>Option A</option>
+                            </select>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+</div>
+
+<script>
+    $(document).ready(function () {
+
+        const answerOptions = ['A', 'B', 'C', 'D'];
+        const classOptions = ['10', '9', '8', '7', '6', '5'];
+
+        console.log("Loaded!")
+
+        answerOptions.map((option) => {
+            let optionHTML = `
+                <div class="col-md-6 d-flex align-items-center">
+                    <span class="bg-light px-3 py-2 rounded-2 border border-0 fw-bold">${option}</span>
+                    <input type="text" class="form-control px-3 py-2" placeholder="Option - ${option}">
+                </div>
+            `
+
+            $('#optionsList').append(optionHTML);
+
+
+        });
+
+        classOptions.map((classOption) => {
+
+            let classOptionHTML = `
+                <option>${classOption}</option>
+            `
+
+            $('#classDropDown').append(classOptionHTML);
+        });
+
+
+    })
+</script>
