@@ -70,11 +70,10 @@
         //});
 
         $('#logoutBtn').on('click', function () {
-
             localStorage.removeItem('UserID');
             localStorage.removeItem('Role');
             localStorage.removeItem('Username');
-
+            localStorage.removeItem('HashKey');
             $(this).addClass('d-none');
             $("#displayUsername").addClass('d-none');
             $("#loginBtn").removeClass('d-none');
