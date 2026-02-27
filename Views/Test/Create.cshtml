@@ -5,6 +5,11 @@
 @Html.Partial("_Navbar")
 @Html.Partial("_UnauthorizedAccess")
 
+<style>
+    #question_textarea {
+        resize:both;
+    }
+</style>
 <div class="container mt-5 pt-5">
 
     <div class="container mt-5 pt-4">
@@ -53,10 +58,9 @@
 
                         <hr>
 
-                        <div class="mb-3 p-2">
+                        <div class="mb-3 p-2 w-auto">
                             <label class="fw-semibold">QUESTION 1</label>
-                            <textarea class="form-control mt-2"
-                                      rows="3"
+                            <textarea class="form-control mt-2" id="question_textarea"
                                       placeholder="Enter question text here..."></textarea>
                         </div>
 
