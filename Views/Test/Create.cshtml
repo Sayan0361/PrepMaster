@@ -1,26 +1,57 @@
-﻿
-@{
+﻿@{
     ViewBag.Title = "Create";
 }
 @Html.Partial("_Navbar")
 @Html.Partial("_UnauthorizedAccess")
 
+<style>
+    .question-item:hover .delete-question {
+        display: block;
+    }
+
+    .delete-question {
+        display: none;
+        position: absolute;
+        top: 15px;
+        right: 15px;
+        cursor: pointer;
+    }
+
+        .delete-question:hover {
+            transform: scale(1.15);
+            transition: 0.2s ease;
+        }
+</style>
+
 <div class="container mt-5 pt-5">
 
     <div class="container mt-5 pt-4">
-        <div class="row g-4">
+        <div class="row g-4 align-items-start">
 
-            <!-- LEFT SIDE (Test Settings) -->
+            <!-- LEFT SIDE -->
             <div class="col-lg-4">
-                <div class="card shadow-sm h-100">
+                <div class="card shadow-sm position-sticky" style="top: 100px;">
                     <div class="card-body shadow">
                         <h4 class="fw-bold mb-4">Test Settings</h4>
                         <hr>
+
+                        <!-- Test Title -->
 
                         <div class="mb-3">
                             <label class="form-label fw-semibold">Test Title</label>
                             <input type="text" class="form-control" placeholder="e.g. Mid-Term Exam">
                         </div>
+
+                        <!-- Test Description -->
+
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">Test Description</label>
+                            <textarea class="form-control"
+                                      rows="4"
+                                      placeholder="Enter test description (instructions, syllabus coverage, notes...)"></textarea>
+                        </div>
+
+                        <!-- Target Class -->
 
                         <div class="mb-3">
                             <label class="form-label fw-semibold">Target Class</label>
@@ -29,20 +60,40 @@
                             </select>
                         </div>
 
+                        <!-- Start Date -->
+
                         <div class="mb-3">
                             <label class="form-label fw-semibold">Start Date</label>
-                            <input type="date" class="mx-3" />
+                            <input type="text" id="startDateTime" class="form-control" />
                         </div>
+
+                        <!-- End Date -->
 
                         <div class="mb-3">
                             <label class="form-label fw-semibold">End Date</label>
-                            <input type="date" class="mx-3" />
+                            <input type="text" id="endDateTime" class="form-control" />
+                        </div>
+
+                        <hr>
+
+                        <!-- Total Marks Section -->
+
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">Total Marks</label>
+                            <div class="input-group shadow-sm">
+                                <span class="input-group-text bg-light fw-bold">Σ</span>
+                                <input type="number"
+                                       id="totalMarks"
+                                       class="form-control fw-bold"
+                                       placeholder="Auto calculated"
+                                       readonly>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- RIGHT SIDE (Question Builder) -->
+            <!-- RIGHT SIDE -->
             <div class="col-lg-8">
                 <div class="card">
                     <div class="card-body shadow">
@@ -53,24 +104,57 @@
 
                         <hr>
 
-                        <div class="mb-3 p-2">
-                            <label class="fw-semibold">QUESTION 1</label>
-                            <textarea class="form-control mt-2"
-                                      rows="3"
-                                      placeholder="Enter question text here..."></textarea>
+                        <div id="questionContainer">
+
+                            <div class="question-item mb-4 p-3 border rounded-3 position-relative">
+
+                                <i class="fa fa-trash text-danger delete-question"></i>
+
+                                <div class="mb-3">
+                                    <label class="fw-semibold question-label">QUESTION 1</label>
+                                    <textarea class="form-control mt-2"
+                                              rows="3"
+                                              placeholder="Enter question text here..."></textarea>
+                                </div>
+
+                                <div class="row g-3 mb-4 optionsList"></div>
+
+                                <div class="row g-3 align-items-end mb-3">
+                                    <div class="col-md-4">
+                                        <label class="form-label fw-semibold">Marks</label>
+                                        <div class="input-group shadow-sm">
+                                            <span class="input-group-text bg-light fw-bold">#</span>
+                                            <input type="number"
+                                                   class="form-control marksInput"
+                                                   id="marks"
+                                                   min="1"
+                                                   placeholder="Enter marks">
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="mb-3 d-flex align-items-center gap-2">
+                                    <label class="form-label fw-semibold">Correct Answer</label>
+                                    <select class="form-select fw-bold text-success border-success correctOptionDropDown"></select>
+                                </div>
+
+                            </div>
+
                         </div>
 
-                        <div class="row g-3 mb-4" id="optionsList">
-                            @*Added Dynamically*@
-                        </div>
+                        <div class="d-flex justify-content-between align-items-center mt-4 pt-3 border-top">
 
-                        <div class="mb-3 d-flex align-items-center gap-2">
-                            <label class="form-label fw-semibold">Correct Answer</label>
-                            <select class="form-select px-3 py-1 border border-secondary rounded bg-white small fw-bold text-success">
-                                <option>Option A</option>
-                            </select>
-                        </div>
+                            <button type="button"
+                                    class="btn btn-link text-decoration-none fw-semibold p-0 add-question-btn">
+                                + Add Another Question
+                            </button>
 
+                            <button class="btn btn-success px-4 py-2 fw-semibold shadow-sm rounded-3">
+                                <i class="fa fa-cloud-upload me-2"></i>
+                                Publish Test
+                            </button>
+
+                        </div>
                     </div>
                 </div>
             </div>
@@ -81,35 +165,121 @@
 </div>
 
 <script>
-    $(document).ready(function () {
+
+    function populateOptions(container) {
 
         const answerOptions = ['A', 'B', 'C', 'D'];
-        const classOptions = ['10', '9', '8', '7', '6', '5'];
 
-        console.log("Loaded!")
+        container.find('.optionsList').empty();
+        container.find('.correctOptionDropDown').empty();
 
-        answerOptions.map((option) => {
+        answerOptions.forEach(function (option) {
+
             let optionHTML = `
                 <div class="col-md-6 d-flex align-items-center">
-                    <span class="bg-light px-3 py-2 rounded-2 border border-0 fw-bold">${option}</span>
+                    <span class="bg-light px-3 py-2 rounded-2 fw-bold">${option}</span>
                     <input type="text" class="form-control px-3 py-2" placeholder="Option - ${option}">
                 </div>
-            `
+            `;
 
-            $('#optionsList').append(optionHTML);
+            let correctOptionHTML = `<option value="${option}">Option ${option}</option>`;
 
+            container.find('.optionsList').append(optionHTML);
+            container.find('.correctOptionDropDown').append(correctOptionHTML);
+        });
+    }
+
+    function updateQuestionNumbers() {
+        $('.question-item').each(function (index) {
+            $(this).find('.question-label').text('QUESTION ' + (index + 1));
+        });
+
+        $('.badge').text('Total: ' + $('.question-item').length);
+    }
+
+    function calculateTotalMarks() {
+
+        let total = 0;
+
+        $('.marksInput').each(function () {
+
+            let value = parseInt($(this).val());
+
+            if (isNaN(value) || value < 0) {
+                $(this).addClass('is-invalid');
+            } else {
+                $(this).removeClass('is-invalid');
+                total += value;
+            }
 
         });
 
-        classOptions.map((classOption) => {
+        $('#totalMarks').val(total);
+    }
 
-            let classOptionHTML = `
-                <option>${classOption}</option>
-            `
+    $(document).ready(function (e) {
 
-            $('#classDropDown').append(classOptionHTML);
+        const classOptions = ['10', '9', '8', '7', '6', '5'];
+
+        classOptions.forEach(function (cls) {
+            $('#classDropDown').append(`<option>${cls}</option>`);
         });
 
+        populateOptions($('.question-item').first());
 
-    })
+        flatpickr("#startDateTime", {
+            enableTime: true,
+            dateFormat: "Y-m-d H:i",
+        });
+
+        flatpickr("#endDateTime", {
+            enableTime: true,
+            dateFormat: "Y-m-d H:i",
+        });
+
+        let questionCount = 1;
+
+        $('.add-question-btn').click(function () {
+
+            questionCount++;
+
+            let cloned = $('.question-item').first().clone();
+
+            cloned.find('textarea').val('');
+            cloned.find('input').val('');
+
+            populateOptions(cloned);
+
+            $('#questionContainer').append(cloned);
+
+            updateQuestionNumbers();
+        });
+
+        $(document).on('click', '.delete-question', function () {
+
+            if ($('.question-item').length > 1) {
+
+                $(this).closest('.question-item').fadeOut(200, function () {
+                    $(this).remove();
+                    updateQuestionNumbers();
+                    calculateTotalMarks()
+                });
+
+            } else {
+                alert("At least one question is required.");
+            }
+
+        });
+
+        $(document).on('input', '.marksInput', function () {
+
+            calculateTotalMarks();
+        });
+    });
+
+    window.addEventListener("beforeunload", function (e) {
+        e.preventDefault();
+        e.returnValue = "";
+    });
+
 </script>
