@@ -132,6 +132,8 @@
                     if (response.success) {
 
                         var userId = response.Data.id;
+                        var userName = response.Data.UserName;
+                        var HashKey = response.Data.HashKey;
 
                         Swal.fire({
                             icon: 'success',
@@ -139,10 +141,11 @@
                             text: response.Message,
                             confirmButtonColor: '#5b5ce2'
                         }).then(() => {
-
+                            
                             localStorage.setItem('Role', selectedRoleValue);
                             localStorage.setItem('UserID', userId);
                             localStorage.setItem('Username', FullName);
+                            localStorage.setItem('HashKey', HashKey);
 
                             if (selectedRoleValue === "Admin") {
 

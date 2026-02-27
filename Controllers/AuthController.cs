@@ -32,13 +32,14 @@ namespace PrepMaster.Controllers
             try
             {
                 int createdUserID = md.SignUp(param);
+                string HashKey = BCrypt.Net.BCrypt.HashPassword(createdUserID.ToString());
                 return Json(
                         new
                         {
                             success = true,
                             StatusCode = 201,
                             Message = "User Created Successfully",
-                            Data = new { id = createdUserID },
+                            Data = new { id = createdUserID, UserName = FullName, HashKey },
                             Error = "",
                         }
                 );
