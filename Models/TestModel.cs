@@ -49,6 +49,17 @@ namespace PrepMaster.Models
         public int IsActive { get; set; }
         public List<QuestionTableType> Questions { get; set; }
     }
+
+    public class TeacherSpecializationModel
+    {
+        public int SpecId { get; set; }
+        public int TeacherId { get; set; }
+        public string TeacherName { get; set; }
+        public int ClassId { get; set; }
+        public string ClassName { get; set; }
+        public int SubjectId { get; set; }
+        public string SubjectName { get; set; }
+    }
 }
 
 namespace PrepMaster.DAL
@@ -146,6 +157,25 @@ namespace PrepMaster.DAL
                 proc,
                 parameters
             );
+        }
+
+        public List<TeacherSpecializationModel> GetTeacherSpecs(int TeacherId)
+        {
+            try
+            {
+                DynamicParameters param = new DynamicParameters();
+                param.Add("@TeacherId", TeacherId);
+
+                var sp = "sp_GetTeacherSpecialization";
+                return _conn.ExecuteMultipleRow<TeacherSpecializationModel>(
+                        sp,
+                        param
+                    );
+            }
+            catch (SqlException ex)
+            {
+                throw ex;
+            }
         }
     }
 }

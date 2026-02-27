@@ -23,9 +23,9 @@
         }
 </style>
 
-<div class="container mt-5 pt-5">
+<div class="container">
 
-    <div class="container mt-5 pt-4">
+    <div class="container mt-2 pt-2">
         <div class="row g-4 align-items-start">
 
             <!-- LEFT SIDE -->
@@ -39,7 +39,7 @@
 
                         <div class="mb-3">
                             <label class="form-label fw-semibold">Test Title</label>
-                            <input type="text" class="form-control" placeholder="e.g. Mid-Term Exam">
+                            <input type="text" class="form-control" placeholder="e.g. Mid-Term Exam" id="Title">
                         </div>
 
                         <!-- Test Description -->
@@ -48,7 +48,8 @@
                             <label class="form-label fw-semibold">Test Description</label>
                             <textarea class="form-control"
                                       rows="4"
-                                      placeholder="Enter test description (instructions, syllabus coverage, notes...)"></textarea>
+                                      placeholder="Enter test description (instructions, syllabus coverage, notes...)"
+                                      id="Description"></textarea>
                         </div>
 
                         <!-- Target Class -->
@@ -57,6 +58,15 @@
                             <label class="form-label fw-semibold">Target Class</label>
                             <select class="form-select" id="classDropDown">
                                 <option>-- Choose Class --</option>
+                            </select>
+                        </div>
+
+                        <!-- Subjects -->
+
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">Subject</label>
+                            <select class="form-select" id="subjectDropDown">
+                                <option>-- Choose Subject --</option>
                             </select>
                         </div>
 
@@ -149,7 +159,7 @@
                                 + Add Another Question
                             </button>
 
-                            <button class="btn btn-success px-4 py-2 fw-semibold shadow-sm rounded-3">
+                            <button class="btn btn-success px-4 py-2 fw-semibold shadow-sm rounded-3" onclick="getCreateTestPostData();">
                                 <i class="fa fa-cloud-upload me-2"></i>
                                 Publish Test
                             </button>
@@ -217,14 +227,98 @@
         $('#totalMarks').val(total);
     }
 
-    $(document).ready(function (e) {
+    function getCreateTestPostData() {
 
-        const classOptions = ['10', '9', '8', '7', '6', '5'];
+        let questions = [];
 
-        classOptions.forEach(function (cls) {
-            $('#classDropDown').append(`<option>${cls}</option>`);
+        $('.question-item').each(function () {
+
+            const questionText = $(this).find('textarea').val().trim();
+            const marks = parseInt($(this).find('.marksInput').val()) || 0;
+            const correctAnswer = $(this).find('.correctOptionDropDown').val();
+
+            let options = [];
+
+            $(this).find('.optionsList input').each(function (index) {
+
+                const optionLabel = ['A', 'B', 'C', 'D'][index];
+
+                options.push({
+                    OptionLabel: optionLabel,
+                    OptionText: $(this).val().trim()
+                });
+
+            });
+
+            questions.push({
+                QuestionText: questionText,
+                Marks: marks,
+                CorrectAnswer: correctAnswer,
+                Options: options
+            });
+
         });
 
+        const postDataJSON = {
+            Title: $('#Title').val().trim(),
+            Description: $('#Description').val().trim(),
+            CreatedByTeacherId: localStorage.getItem("UserID"),
+            TargetClassId: $('#classDropDown').val(),
+            SubjectId: $('#subjectDropDown').val(),
+            StartDateTime: $('#startDateTime').val(),
+            EndDateTime: $('#endDateTime').val(),
+            TotalMarks: $('#totalMarks').val(),
+            Questions: questions
+        };
+        console.log(postDataJSON)
+        console.log(postDataJSON.Questions)
+        return postDataJSON;
+    }
+
+    $(document).ready(function (e) {
+
+        //const classOptions = ['10', '9', '8', '7', '6', '5'];
+        const classOptions = [];
+        const subjectOptions = [];
+        var TeacherId = localStorage.getItem("UserID");
+
+        $.ajax({
+            url: '@Url.Action("GetTeacherSpecs", "Test")',
+            data: {
+                TeacherId
+            },
+            type: 'GET',
+            success: function (response) {
+                response.teacherSpecs.map((res) => {
+                    classOptions.push({ id: res.ClassId, className: res.ClassName })
+                    subjectOptions.push({ id: res.SubjectId, subjectName: res.SubjectName })
+                })
+
+                classOptions.map(function (cls) {
+                    $('#classDropDown').append(`<option value=${cls.id}>${cls.className}</option>`);
+                });
+                console.log(classOptions);
+
+                subjectOptions.map(function (sub) {
+                    $('#subjectDropDown').append(`<option value=${sub.id}>${sub.subjectName}</option>`);
+                });
+                console.log(subjectOptions);
+
+            },
+            error: function (response) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Server Error',
+                    text: 'Something went wrong. Please try again tomorrow.',
+                    confirmButtonColor: '#dc3545'
+                });
+            }
+        })
+
+        console.log(classOptions)
+
+        
+        
         populateOptions($('.question-item').first());
 
         flatpickr("#startDateTime", {
@@ -275,6 +369,8 @@
 
             calculateTotalMarks();
         });
+
+
     });
 
     window.addEventListener("beforeunload", function (e) {

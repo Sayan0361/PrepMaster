@@ -166,13 +166,16 @@
 
 <script>
     $(document).ready(function () {
+
+        var userID = localStorage.getItem("UserID");
+
         verifyUserAccess({
             verifyUrl: '@Url.Action("VerifyUser", "Auth")',
             redirectUrl: '@Url.Action("Index", "Home")',
             hideSelector: "#main-container"
         });
 
-        
+
         $('.status').map(function () {
             const status = $(this).text()
             $(this).removeClass()
@@ -189,7 +192,8 @@
 
         $('#create-test-btn').on('click', function () {
 
-            window.location.href = '@Url.Action("Create", "Test", new {id = 2})'
+            var baseUrl = '@Url.Action("Create", "Test", new { id = 0 })';
+            window.location.href = baseUrl.replace("0", userID);
 
         })
     });

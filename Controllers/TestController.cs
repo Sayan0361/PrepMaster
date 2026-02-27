@@ -24,8 +24,16 @@ namespace PrepMaster.Controllers
             return View();
         }
 
-        public ActionResult Create(int id) //teacherID
+        public JsonResult GetTeacherSpecs(int TeacherId) //teacherID
         {
+            var teacherSpecs = _dal.GetTeacherSpecs(TeacherId);
+            return Json(new { teacherSpecs }, JsonRequestBehavior.AllowGet);
+        }
+
+        public ActionResult Create(int id)
+        {
+            //var teacherSpecsList = _dal.GetTeacherSpecs(id);
+            //return View(teacherSpecsList);
             return View();
         }
 
