@@ -244,18 +244,30 @@
                 const optionLabel = ['A', 'B', 'C', 'D'][index];
 
                 options.push({
-                    OptionLabel: optionLabel,
                     OptionText: $(this).val().trim()
                 });
 
             });
 
+            let optionInputs = $(this).find('.optionsList input');
+
+            const optionA = $(optionInputs[0]).val().trim();
+            const optionB = $(optionInputs[1]).val().trim();
+            const optionC = $(optionInputs[2]).val().trim();
+            const optionD = $(optionInputs[3]).val().trim();
+
             questions.push({
                 QuestionText: questionText,
+                OptionA: optionA,
+                OptionB: optionB,
+                OptionC: optionC,
+                OptionD: optionD,
                 Marks: marks,
                 CorrectAnswer: correctAnswer,
-                Options: options
+               
             });
+
+
 
         });
 
@@ -272,6 +284,20 @@
         };
         console.log(postDataJSON)
         console.log(postDataJSON.Questions)
+
+
+        $.ajax({
+            url: '@Url.Action("Create", "Test")',
+            type: 'POST',
+            data: postDataJSON,
+            success: function (response) {
+                console.log("Success response: ", response)
+            },
+            error: function (response) {
+                console.log("Error response: ", response)
+            }
+        })
+
         return postDataJSON;
     }
 
@@ -317,8 +343,8 @@
 
         console.log(classOptions)
 
-        
-        
+
+
         populateOptions($('.question-item').first());
 
         flatpickr("#startDateTime", {
@@ -369,6 +395,7 @@
 
             calculateTotalMarks();
         });
+
 
 
     });
