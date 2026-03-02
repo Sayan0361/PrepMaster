@@ -298,7 +298,14 @@
                         title: 'Success',
                         text: response.Message,
                         confirmButtonColor: '#5b5ce2'
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            var teacherId = localStorage.getItem("UserID");
+                            var baseUrl = '@Url.Action("Index","Teacher", new { id = 0 })';
+                            window.location.href = baseUrl.replace("0", teacherId);
+                        }
                     })
+
                 }
                 else {
                     Swal.fire({
@@ -323,12 +330,28 @@
         return postDataJSON;
     }
 
+    function getFilteredSubjects(subjectOptions) {
+        $("#classDropDown").on('change', function (e) {
+
+            $("#subjectDropDown").empty()
+            const selectedClassID = $("#classDropDown option:selected").val()
+            console.log("Selected ClassID: ", selectedClassID);
+
+            const subjectFilteredOptions = subjectOptions.filter(sub => sub.classID == selectedClassID)
+
+            subjectFilteredOptions.map(function (sub) {
+                $('#subjectDropDown').append(`<option value=${sub.id} class="subjectOptions">${sub.subjectName}</option>`);
+            });
+        });
+    }
+
     $(document).ready(function (e) {
 
         //const classOptions = ['10', '9', '8', '7', '6', '5'];
         const classOptions = [];
         const subjectOptions = [];
         var TeacherId = localStorage.getItem("UserID");
+
 
         $.ajax({
             url: '@Url.Action("GetTeacherSpecs", "Test")',
@@ -337,20 +360,21 @@
             },
             type: 'GET',
             success: function (response) {
+                console.log("Response: ", response)
                 response.teacherSpecs.map((res) => {
-                    classOptions.push({ id: res.ClassId, className: res.ClassName })
-                    subjectOptions.push({ id: res.SubjectId, subjectName: res.SubjectName })
+                    if (!classOptions.some(cls => cls.id === res.ClassId)) {
+                        classOptions.push({id: res.ClassId, className: res.ClassName});
+                    }
+                    subjectOptions.push({ id: res.SubjectId, subjectName: res.SubjectName, classID: res.ClassId })
                 })
-
                 classOptions.map(function (cls) {
-                    $('#classDropDown').append(`<option value=${cls.id}>${cls.className}</option>`);
+                    $('#classDropDown').append(`<option value=${cls.id} id="classOption" > ${cls.className}</option>`);
                 });
                 console.log(classOptions);
+                console.log("Subject Options: ", subjectOptions);
 
-                subjectOptions.map(function (sub) {
-                    $('#subjectDropDown').append(`<option value=${sub.id}>${sub.subjectName}</option>`);
-                });
-                console.log(subjectOptions);
+
+                getFilteredSubjects(subjectOptions);
 
             },
             error: function (response) {
