@@ -28,7 +28,7 @@
 
     @Html.Partial("_Navbar")
 
-    <div class="container mt-5 pt-5" >
+    <div class="container mt-5 pt-2" >
 
         <h1 class="text-center text-primary fw-bold pt-5">
             Master Exams with Confidence
@@ -76,8 +76,36 @@
             </div>
 
         </div>
+        <div class=" text-center pt-4 ">
+            <button type="button" class="btn btn-outline-success btn-lg" id="getStarted" 
+                    data-bs-toggle="button" autocomplete="off">Get Started</button>
+        </div>
     </div>
+    <script>
+        $(document).ready(function () {
 
+                var userId = localStorage.getItem("UserID");
+            $("#getStarted").on('click', function () {
+                console.log(userId);
+                        if (userId != null) {
+                            // user is logged in
+                            if (localStorage.getItem("Role") == "Admin") {
+                                var baseUrl = '@Url.Action("Index","Teacher", new { id = 0 })';
+                                window.location.href = baseUrl.replace("0", userId);
+                            }
+                            else {
+                                var baseUrl = '@Url.Action("Index","Student", new { id = 0 })';
+                                window.location.href = baseUrl.replace("0", userId);
+                            }
 
+                        }
+                        else {
+                            // user not logged in
+                            window.location.href = '/PrepMaster/Auth/Login';
+                        }
+                });
+
+            });
+    </script>
 </body>
 </html>
