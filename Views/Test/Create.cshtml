@@ -263,8 +263,7 @@
                 OptionC: optionC,
                 OptionD: optionD,
                 Marks: marks,
-                CorrectAnswer: correctAnswer,
-               
+                CorrectOption: correctAnswer,
             });
 
 
@@ -280,7 +279,8 @@
             StartDateTime: $('#startDateTime').val(),
             EndDateTime: $('#endDateTime').val(),
             TotalMarks: $('#totalMarks').val(),
-            Questions: questions
+            isActive: 1,
+            Questions: questions,
         };
         console.log(postDataJSON)
         console.log(postDataJSON.Questions)
@@ -291,10 +291,32 @@
             type: 'POST',
             data: postDataJSON,
             success: function (response) {
-                console.log("Success response: ", response)
+                console.log("Response from success function: ", response)
+                if (response.Success) {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Success',
+                        text: response.Message,
+                        confirmButtonColor: '#5b5ce2'
+                    })
+                }
+                else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: response.Message,
+                        confirmButtonColor: '#dc3545'
+                    });
+                }
             },
             error: function (response) {
-                console.log("Error response: ", response)
+                console.log("Error response: ", response);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Server Error',
+                    text: 'Something went wrong. Please try again.',
+                    confirmButtonColor: '#dc3545'
+                });
             }
         })
 
