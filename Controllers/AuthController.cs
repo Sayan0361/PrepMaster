@@ -21,6 +21,21 @@ namespace PrepMaster.Controllers
         [HttpPost]
         public JsonResult SignUp(string FullName,string Email, string Password,string Role)
         {
+
+            if(FullName =="" || Email =="" || Password =="" || Role =="")
+            {
+                return Json(
+                    new
+                    {
+                        success = false,
+                        StatusCode = 400,
+                        Message = "Fields missing",
+                        Data = new { },
+                        Error = "",
+                    }
+                );
+            }
+
             DynamicParameters param = new DynamicParameters();
             string PasswordHash = BCrypt.Net.BCrypt.HashPassword(Password);
             param.Add("FullName", FullName);
@@ -68,6 +83,19 @@ namespace PrepMaster.Controllers
         [HttpPost]
         public JsonResult LogIn(string Email, string Password, string Role)
         {
+            if (Email == "" || Password == "")
+            {
+                return Json(
+                    new
+                    {
+                        success = false,
+                        StatusCode = 400,
+                        Message = "Fields missing",
+                        Data = new { },
+                        Error = "",
+                    }
+                );
+            }
             DynamicParameters param = new DynamicParameters();
             //string PasswordHash = BCrypt.Net.BCrypt.HashPassword(Password);
             param.Add("Email", Email);
