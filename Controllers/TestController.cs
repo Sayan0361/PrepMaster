@@ -72,5 +72,36 @@ namespace PrepMaster.Controllers
                 Message = result.Message
             });
         }
+
+        public ActionResult StartTest(int TestID, int StudentId)
+        {
+            var result = _dal.StartTest(TestID, StudentId);
+
+            if (result == null || result.Response == null)
+            {
+                return Json(new
+                {
+                    Success = false,
+                    Message = "Something went wrong."
+                });
+            }
+
+            if (result.Response.Success == 0)
+            {
+                return Json(new
+                {
+                    Success = false,
+                    Message = result.Response.Message
+                });
+            }
+
+            return Json(new
+            {
+                Success = result.Response.Success == 1,
+                Message = result.Response.Message,
+                Test = result.Test,
+                Questions = result.Questions
+            });
+        }
     }
 }

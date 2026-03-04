@@ -60,6 +60,31 @@ namespace PrepMaster.Models
         public int SubjectId { get; set; }
         public string SubjectName { get; set; }
     }
+    public class TestStartModel
+    {
+        public int TestId { get; set; }
+        public string Title { get; set; }
+        public string Description { get; set; }
+        public DateTime StartDateTime { get; set; }
+        public DateTime EndDateTime { get; set; }
+        public int TotalMarks { get; set; }
+    }
+    public class QuestionStartModel
+    {
+        public int QuestionId { get; set; }
+        public string QuestionText { get; set; }
+        public string OptionA { get; set; }
+        public string OptionB { get; set; }
+        public string OptionC { get; set; }
+        public string OptionD { get; set; }
+        public int Marks { get; set; }
+    }
+    public class StartTestResponseModel
+    {
+        public TestStartModel Test { get; set; }
+        public List<QuestionStartModel> Questions { get; set; }
+        public DbResponse Response { get; set; }
+    }
 }
 
 namespace PrepMaster.DAL
@@ -72,18 +97,6 @@ namespace PrepMaster.DAL
             _conn = new DapperConn();
         }
 
-        //public int CreateTest(DynamicParameters param)
-        //{
-        //    try
-        //    {
-        //        _conn.ExecuteWithoutReturn("sp_CreateTest", param);
-        //        return 201;  // statuscode for successfully created
-        //    }
-        //    catch (SqlException ex)
-        //    {
-        //        throw ex;
-        //    }
-        //}
          public List<TestModel> GetTestsForStudent(int StudentId)
          {
             try
@@ -175,6 +188,37 @@ namespace PrepMaster.DAL
             catch (SqlException ex)
             {
                 throw ex;
+            }
+        }
+
+        public StartTestResponseModel StartTest(int TestID, int StudentId)
+        {
+            try
+            {
+                var parameters = new DynamicParameters();
+                parameters.Add("@TestID", TestID);
+                parameters.Add("@StudentId", StudentId);
+                var proc = "sp_StartTest";
+
+                var result = _conn.ExecuteMultipleResult<TestStartModel, QuestionStartModel, DbResponse>(
+                    proc,
+                    parameters
+                );
+
+                return new StartTestResponseModel
+                {
+                    Test = result.Item1,
+                    Questions = result.Item2 ?? new List<QuestionStartModel>(),
+                    Response = result.Item3 ?? new DbResponse
+                    {
+                        Success = 0,
+                        Message = "Unknown error."
+                    }
+                };
+            }
+            catch (SqlException)
+            {
+                throw;
             }
         }
     }

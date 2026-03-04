@@ -11,7 +11,9 @@ BEGIN
 
         DECLARE @CurrentTime DATETIME = GETDATE();
 
-		-- Student Exists
+        -- Validation Section
+      
+        -- Student Exists
         IF NOT EXISTS (
             SELECT 1
             FROM dbo.Users
@@ -19,8 +21,7 @@ BEGIN
               AND Role = 'Student'
         )
         BEGIN
-            SELECT 0 AS Success, 'Invalid student.' AS Message;
-            RETURN;
+            GOTO ValidationFailed;
         END
 
         -- Student Belongs To Target Class
@@ -33,8 +34,7 @@ BEGIN
               AND u.StudentClassId = t.TargetClassId
         )
         BEGIN
-            SELECT 0 AS Success, 'Student not allowed for this test.' AS Message;
-            RETURN;
+            GOTO ValidationFailed;
         END
 
         -- Test Exists & Active
@@ -45,20 +45,18 @@ BEGIN
               AND IsActive = 1
         )
         BEGIN
-            SELECT 0 AS Success, 'Invalid or inactive test.' AS Message;
-            RETURN;
+            GOTO ValidationFailed;
         END
-     
-        --  Test Time Window Check
+
+        -- Time Window Check 
         IF NOT EXISTS (
             SELECT 1
             FROM dbo.Tests
             WHERE TestId = @TestID
-              AND @CurrentTime BETWEEN StartDateTime AND EndDateTime
+              --AND @CurrentTime BETWEEN StartDateTime AND EndDateTime
         )
         BEGIN
-            SELECT 0 AS Success, 'Test is not available at this time.' AS Message;
-            RETURN;
+            GOTO ValidationFailed;
         END
 
         -- Prevent Re-attempt
@@ -69,11 +67,11 @@ BEGIN
               AND StudentId = @StudentId
         )
         BEGIN
-            SELECT 0 AS Success, 'Test already submitted.' AS Message;
-            RETURN;
+            GOTO ValidationFailed;
         END
 
-        -- Return Test Info
+        -- SUCCESS 
+        -- Result Set 1: Test Info
         SELECT
             t.TestId,
             t.Title,
@@ -84,7 +82,7 @@ BEGIN
         FROM dbo.Tests t
         WHERE t.TestId = @TestID;
 
-        --  Return Questions (Without CorrectOption)
+        -- Result Set 2: Questions
         SELECT
             q.QuestionId,
             q.QuestionText,
@@ -96,14 +94,66 @@ BEGIN
         FROM dbo.Questions q
         WHERE q.TestId = @TestID;
 
-        -- Success
+        -- Result Set 3: Response
         SELECT 1 AS Success,
                'Test started successfully.' AS Message;
 
+        RETURN;
+
+        -- FAILURE FLOW (Always Return 3 Result Sets)
+        ValidationFailed:
+
+        -- Empty Test
+        SELECT 
+            NULL AS TestId,
+            NULL AS Title,
+            NULL AS Description,
+            NULL AS StartDateTime,
+            NULL AS EndDateTime,
+            NULL AS TotalMarks
+        WHERE 1 = 0;
+
+        -- Empty Questions
+        SELECT 
+            NULL AS QuestionId,
+            NULL AS QuestionText,
+            NULL AS OptionA,
+            NULL AS OptionB,
+            NULL AS OptionC,
+            NULL AS OptionD,
+            NULL AS Marks
+        WHERE 1 = 0;
+
+        -- Failure Response
+        SELECT 0 AS Success,
+               'Test cannot be started.' AS Message;
+
     END TRY
     BEGIN CATCH
+
+        -- Always return 3 result sets even on SQL error
+        SELECT 
+            NULL AS TestId,
+            NULL AS Title,
+            NULL AS Description,
+            NULL AS StartDateTime,
+            NULL AS EndDateTime,
+            NULL AS TotalMarks
+        WHERE 1 = 0;
+
+        SELECT 
+            NULL AS QuestionId,
+            NULL AS QuestionText,
+            NULL AS OptionA,
+            NULL AS OptionB,
+            NULL AS OptionC,
+            NULL AS OptionD,
+            NULL AS Marks
+        WHERE 1 = 0;
+
         SELECT 0 AS Success,
                ERROR_MESSAGE() AS Message;
+
     END CATCH
 END
 GO
@@ -116,4 +166,4 @@ WHERE Role = 'Student'; -- StudentId 5 since he is in TargetClassId 1
 GO
 EXEC sp_StartTest
     @TestID = 1002,
-    @StudentId = 5;
+    @StudentId = 4;

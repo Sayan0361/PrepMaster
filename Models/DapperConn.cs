@@ -53,5 +53,25 @@ namespace PrepMaster.Models
             }
         }
 
+        // Get Multiple Model Results 
+        public (T1, List<T2>, T3) ExecuteMultipleResult<T1, T2, T3>(
+    string procName,
+    DynamicParameters param)
+        {
+            using (SqlConnection conn = new SqlConnection(connectionString))
+            {
+                conn.Open();
+
+                using (var multi = conn.QueryMultiple(procName, param, commandType: CommandType.StoredProcedure))
+                {
+                    var tests = multi.Read<T1>().FirstOrDefault();
+                    var questions = multi.Read<T2>().ToList();
+                    var response = multi.Read<T3>().FirstOrDefault();
+
+                    return (tests, questions, response);
+                }
+            }
+        }
+
     }
 }
