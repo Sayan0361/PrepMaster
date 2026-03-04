@@ -1,0 +1,119 @@
+CREATE OR ALTER PROC sp_StartTest
+(
+    @TestID INT,
+    @StudentId INT
+)
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    BEGIN TRY
+
+        DECLARE @CurrentTime DATETIME = GETDATE();
+
+		-- Student Exists
+        IF NOT EXISTS (
+            SELECT 1
+            FROM dbo.Users
+            WHERE UserId = @StudentId
+              AND Role = 'Student'
+        )
+        BEGIN
+            SELECT 0 AS Success, 'Invalid student.' AS Message;
+            RETURN;
+        END
+
+        -- Student Belongs To Target Class
+        IF NOT EXISTS (
+            SELECT 1
+            FROM dbo.Users u
+            INNER JOIN dbo.Tests t
+                ON t.TestId = @TestID
+            WHERE u.UserId = @StudentId
+              AND u.StudentClassId = t.TargetClassId
+        )
+        BEGIN
+            SELECT 0 AS Success, 'Student not allowed for this test.' AS Message;
+            RETURN;
+        END
+
+        -- Test Exists & Active
+        IF NOT EXISTS (
+            SELECT 1
+            FROM dbo.Tests
+            WHERE TestId = @TestID
+              AND IsActive = 1
+        )
+        BEGIN
+            SELECT 0 AS Success, 'Invalid or inactive test.' AS Message;
+            RETURN;
+        END
+     
+        --  Test Time Window Check
+        IF NOT EXISTS (
+            SELECT 1
+            FROM dbo.Tests
+            WHERE TestId = @TestID
+              AND @CurrentTime BETWEEN StartDateTime AND EndDateTime
+        )
+        BEGIN
+            SELECT 0 AS Success, 'Test is not available at this time.' AS Message;
+            RETURN;
+        END
+
+        -- Prevent Re-attempt
+        IF EXISTS (
+            SELECT 1
+            FROM dbo.TestResults
+            WHERE TestId = @TestID
+              AND StudentId = @StudentId
+        )
+        BEGIN
+            SELECT 0 AS Success, 'Test already submitted.' AS Message;
+            RETURN;
+        END
+
+        -- Return Test Info
+        SELECT
+            t.TestId,
+            t.Title,
+            t.Description,
+            t.StartDateTime,
+            t.EndDateTime,
+            t.TotalMarks
+        FROM dbo.Tests t
+        WHERE t.TestId = @TestID;
+
+        --  Return Questions (Without CorrectOption)
+        SELECT
+            q.QuestionId,
+            q.QuestionText,
+            q.OptionA,
+            q.OptionB,
+            q.OptionC,
+            q.OptionD,
+            q.Marks
+        FROM dbo.Questions q
+        WHERE q.TestId = @TestID;
+
+        -- Success
+        SELECT 1 AS Success,
+               'Test started successfully.' AS Message;
+
+    END TRY
+    BEGIN CATCH
+        SELECT 0 AS Success,
+               ERROR_MESSAGE() AS Message;
+    END CATCH
+END
+GO
+SELECT *
+FROM dbo.Tests; -- TestID 1002, TargetClassId 1
+GO
+SELECT UserId, Role, StudentClassId
+FROM dbo.Users
+WHERE Role = 'Student'; -- StudentId 5 since he is in TargetClassId 1
+GO
+EXEC sp_StartTest
+    @TestID = 1002,
+    @StudentId = 5;

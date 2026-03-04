@@ -1,0 +1,129 @@
+CREATE OR ALTER PROC sp_SubmitTest
+(
+    @TestID INT,
+    @StudentId INT,
+    @Answers dbo.AnswerTableType READONLY
+)
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    BEGIN TRY
+        BEGIN TRAN;
+
+        DECLARE @TotalMarks INT = 0;
+        DECLARE @TotalQuestions INT = 0;
+        DECLARE @MaxMarks INT = 0;
+        DECLARE @Percentage DECIMAL(5,2) = 0;
+        DECLARE @Status VARCHAR(10);
+        DECLARE @CurrentTime DATETIME = GETDATE();
+
+		-- test already submitted?
+		IF EXISTS (
+			SELECT 1
+			FROM dbo.TestResults
+			WHERE TestId = @TestID
+			  AND StudentId = @StudentId
+		)
+		BEGIN
+			SELECT 0 AS Success,
+				   'Test already submitted.' AS Message;
+			ROLLBACK;
+			RETURN;
+		END
+        -- Total Questions
+        SELECT @TotalQuestions = COUNT(*)
+        FROM dbo.Questions
+        WHERE TestId = @TestID;
+
+        -- Max Marks
+        SELECT @MaxMarks = SUM(Marks)
+        FROM dbo.Questions
+        WHERE TestId = @TestID;
+
+        -- Score Calculation
+        SELECT
+            @TotalMarks = SUM(
+                CASE
+                    WHEN UPPER(q.CorrectOption) = UPPER(a.AttemptedOption)
+                    THEN q.Marks
+                    ELSE 0
+                END
+            )
+        FROM dbo.Questions q
+        LEFT JOIN @Answers a
+            ON q.QuestionId = a.QuestionId
+        WHERE q.TestId = @TestID;
+
+        SET @TotalMarks = ISNULL(@TotalMarks, 0);
+        SET @MaxMarks = ISNULL(@MaxMarks, 0);
+
+        -- Percentage Calculation
+        IF @MaxMarks > 0
+            SET @Percentage = (@TotalMarks * 100.0) / @MaxMarks;
+        ELSE
+            SET @Percentage = 0;
+
+        -- Pass / Fail Logic (40%)
+        IF @Percentage >= 40
+            SET @Status = 'Pass';
+        ELSE
+            SET @Status = 'Fail';
+
+        -- Insert Result
+        INSERT INTO dbo.TestResults
+        (
+            TestId,
+            StudentId,
+            ScoreObtained,
+            TotalQuestions,
+            Status,
+            SubmissionDate
+        )
+        VALUES
+        (
+            @TestID,
+            @StudentId,
+            @TotalMarks,
+            @TotalQuestions,
+            @Status,
+            @CurrentTime
+        );
+
+        COMMIT;
+
+        SELECT 
+            1 AS Success,
+            'Test submitted successfully.' AS Message,
+            @TotalMarks AS ScoreObtained,
+            @Percentage AS Percentage,
+            @Status AS ResultStatus;
+
+    END TRY
+    BEGIN CATCH
+
+        IF @@TRANCOUNT > 0
+            ROLLBACK;
+
+        SELECT 0 AS Success,
+               ERROR_MESSAGE() AS Message;
+
+    END CATCH
+END
+GO
+SELECT QuestionId, CorrectOption, Marks
+FROM dbo.Questions
+WHERE TestId = 1002;
+GO
+DECLARE @Ans dbo.AnswerTableType;
+
+INSERT INTO @Ans (QuestionId, AttemptedOption)
+VALUES
+(1002, 'B'), -- correct
+(1003, 'D'); -- wrong 
+
+EXEC sp_SubmitTest
+    @TestID = 1002,
+    @StudentId = 5,
+    @Answers = @Ans;
+
