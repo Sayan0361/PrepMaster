@@ -73,7 +73,12 @@ namespace PrepMaster.Controllers
             });
         }
 
-        public ActionResult StartTest(int TestID, int StudentId)
+        public ActionResult StartTest()
+        {
+            return View();
+        }
+
+        public JsonResult StartTestJSONData(int TestID, int StudentId)
         {
             var result = _dal.StartTest(TestID, StudentId);
 
@@ -101,7 +106,7 @@ namespace PrepMaster.Controllers
                 Message = result.Response.Message,
                 Test = result.Test,
                 Questions = result.Questions
-            });
+            }, JsonRequestBehavior.AllowGet);
         }
     }
 }

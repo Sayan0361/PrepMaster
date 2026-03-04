@@ -1,0 +1,20 @@
+﻿create or alter proc sp_GetQuestionsByTestID
+	@TestId INT
+as
+begin
+	select
+		q.QuestionId,
+		q.QuestionText,
+		q.OptionA,
+		q.OptionB,
+		q.OptionC,
+		q.OptionD,
+		q.CorrectOption,
+		q.Marks,
+		q.TestId
+	from dbo.Questions q
+	where q.TestId = @TestId;
+end;
+
+exec sp_GetQuestionsByTestID
+	@TestId = 1;

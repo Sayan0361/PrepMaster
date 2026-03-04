@@ -22,7 +22,7 @@
         </div>
 
         <!-- Tabs -->
-        <ul class="nav nav-tabs mb-4 mt-3" id="assessmentTabs" role="tablist">
+        <ul class="nav nav-tabs mb-4 mt-3">
             <li class="nav-item">
                 <button class="nav-link active"
                         data-bs-toggle="tab"
@@ -43,17 +43,21 @@
         </ul>
 
         <!-- Tab Content -->
-        <div class="tab-content">
+        <div class="tab-content row">
 
-            <!-- Available Tests Tab -->
+            <!-- Available Tests -->
             <div class="tab-pane fade show active" id="available">
 
                 @if (Model != null && Model.Any())
                 {
-                    foreach (var test in Model)
-                    {
-                        @Html.Partial("_Card", test)
-                    }
+                    <div class="row g-4">
+                        @foreach (var test in Model)
+                        {
+                            <div class="col-12 col-md-6 col-lg-3">
+                                @Html.Partial("_Card", test)
+                            </div>
+                        }
+                    </div>
                 }
                 else
                 {
@@ -62,7 +66,6 @@
                             <h5 class="text-muted mb-2">No Tests Available</h5>
                             <p class="text-secondary mb-0">
                                 There are currently no tests assigned to you.
-                                Please check back later.
                             </p>
                         </div>
                     </div>
@@ -70,7 +73,7 @@
 
             </div>
 
-            <!-- Results Tab -->
+            <!-- Results -->
             <div class="tab-pane fade" id="results">
                 <div class="text-center mt-5">
                     <div class="card shadow-sm p-4">
@@ -83,16 +86,60 @@
             </div>
 
         </div>
-
     </div>
 </main>
 
 <script>
-    @*$(document).ready(function () {
-         verifyUserAccess({
+    $(document).ready(function () {
+
+        // Access verification
+        verifyUserAccess({
             verifyUrl: '@Url.Action("VerifyUser", "Auth")',
             redirectUrl: '@Url.Action("Index", "Home")',
             hideSelector: "#main-container"
         });
-})*@
+
+        // Duration & Due Time Calculation
+        $(".test-card").each(function () {
+
+            var card = $(this);
+
+            var startTime = card.data("start");
+            var endTime = card.data("end");
+
+            var start = new Date(startTime);
+            var end = new Date(endTime);
+
+            // Duration
+            var diffMs = end - start;
+            var diffMinutes = Math.floor(diffMs / 60000);
+            var hours = Math.floor(diffMinutes / 60);
+            var minutes = diffMinutes % 60;
+
+            var duration = hours + " hr " + minutes + " min";
+            card.find(".durationText").text(duration);
+
+            // Due Time
+            var today = new Date();
+            today.setHours(0, 0, 0, 0);
+
+            var startDate = new Date(startTime);
+            startDate.setHours(0, 0, 0, 0);
+
+            var diffDays = Math.ceil((startDate - today) / (1000 * 60 * 60 * 24));
+
+            var dueText = "";
+
+            if (diffDays > 0)
+                dueText = diffDays + " days left";
+            else if (diffDays === 0)
+                dueText = "Today";
+            else
+                dueText = "Expired";
+
+            card.find(".dueText").text(dueText);
+
+        });
+
+    });
 </script>
