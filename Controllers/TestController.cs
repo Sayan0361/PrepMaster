@@ -88,7 +88,7 @@ namespace PrepMaster.Controllers
                 {
                     Success = false,
                     Message = "Something went wrong."
-                });
+                }, JsonRequestBehavior.AllowGet);
             }
 
             if (result.Response.Success == 0)
@@ -97,7 +97,7 @@ namespace PrepMaster.Controllers
                 {
                     Success = false,
                     Message = result.Response.Message
-                });
+                }, JsonRequestBehavior.AllowGet);
             }
 
             return Json(new

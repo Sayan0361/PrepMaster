@@ -92,6 +92,8 @@
 <script>
     $(document).ready(function () {
 
+        const studentID = localStorage.getItem("UserID")
+
         // Access verification
         verifyUserAccess({
             verifyUrl: '@Url.Action("VerifyUser", "Auth")',
@@ -139,6 +141,22 @@
 
             card.find(".dueText").text(dueText);
 
+        });
+
+        $(document).on("click", ".startTestBtn", function () {
+
+            var card = $(this).closest(".test-card");
+
+            var testId = card.data("id");
+
+            // Save to localStorage
+            localStorage.setItem("selectedTestId", testId);
+
+            console.log("Saved TestID:", testId);
+
+            // Optional: redirect to test page
+            // window.location.href = "/Student/StartTest";
+            window.location.href = '@Url.Action("StartTest", "Test")';
         });
 
     });

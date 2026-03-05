@@ -3,6 +3,7 @@
 <div class="card custom-hover border-0 shadow-lg rounded-4 p-2 test-card"
      data-start="@Model.StartDateTime.ToString("yyyy-MM-ddTHH:mm:ss")"
      data-end="@Model.EndDateTime.ToString("yyyy-MM-ddTHH:mm:ss")"
+     data-id="@Model.TestId"
      style="background:#f8fafc;">
 
     <div class="card-body p-3">
@@ -37,7 +38,7 @@
         </p>
 
         <!-- Button -->
-        <button class="btn w-100 text-white fw-semibold py-2 rounded-3"
+        <button class="btn w-100 text-white fw-semibold py-2 rounded-3 startTestBtn"
                 style="background:linear-gradient(90deg,#4f46e5,#6366f1); border:none; font-size:14px;">
             Start Test
         </button>
