@@ -141,22 +141,44 @@
 
             card.find(".dueText").text(dueText);
 
+            //Disable the button for expired test
+
+            var now = new Date();
+            const ediff = end - now;
+            const sdiff = start - now;
+            
+            if (ediff < 0) {
+                $(this).find('.startTestBtn').prop('disabled', true);
+            }
+
         });
 
         $(document).on("click", ".startTestBtn", function () {
+            Swal.fire({
+                title: "Are you sure?",
+                text: "Would you like to start the test?",
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#3085d6",
+                cancelButtonColor: "#d33",
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    var card = $(this).closest(".test-card");
 
-            var card = $(this).closest(".test-card");
+                    var testId = card.data("id");
 
-            var testId = card.data("id");
+                    // Save to localStorage
+                    localStorage.setItem("selectedTestId", testId);
 
-            // Save to localStorage
-            localStorage.setItem("selectedTestId", testId);
+                    console.log("Saved TestID:", testId);
 
-            console.log("Saved TestID:", testId);
+                    // Optional: redirect to test page
+                    // window.location.href = "/Student/StartTest";
 
-            // Optional: redirect to test page
-            // window.location.href = "/Student/StartTest";
-            window.location.href = '@Url.Action("StartTest", "Test")';
+                    window.location.href = '@Url.Action("StartTest", "Test")';
+                }
+            });
+
         });
 
     });
