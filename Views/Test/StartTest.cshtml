@@ -41,11 +41,11 @@
 
                     <div class="col-lg-4 text-lg-end mt-3 mt-lg-0">
                         <div class="d-inline-block bg-black rounded-3 px-3 py-2 text-center">
-                            <div class="text-secondary text-uppercase small">
+                            <div class="text-secondary text-uppercase small" id="timeRemainingHeader">
                                 Time Remaining
                             </div>
-                            <div class="text-warning fw-bold fs-5" id="timer">
-                                4:39
+                            <div class="text-warning fw-bold fs-5" id="timerDisplay">
+                                
                             </div>
                         </div>
                     </div>
@@ -76,52 +76,8 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.js" integrity="sha512-+k1pnlgt4F1H8L7t3z95o3/KO+o78INEcXTbnoJQ/F2VqDVhWoaiVml/OEHv9HsVgxUaVW+IbiZPUJQfF/YxZw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 
 <script>
-        //$("#question-container")
 
-        const dummyResponse = {
-            "test": {
-                "testId": 1002,
-                "title": "Math Unit Test",
-                "description": "Basic arithmetic test",
-                "targetClassId": 1,
-                "className": "Grade 5",
-                "subjectId": 10,
-                "subjectName": "Mathematics",
-                "startDateTime": "2026-03-28T09:30:00",
-                "endDateTime": "2026-03-28T11:30:00",
-                "testStatus": "Active",
-                "attemptStatus": "Not Attempted",
-                "scoreObtained": 0,
-                "totalMarks": 10,
-                "resultStatus": "Pending"
-            },
-            "questions": [
-                {
-                    "questionId": 1002,
-                    "questionText": "What is 2 + 2?",
-                    "optionA": "3",
-                    "optionB": "4",
-                    "optionC": "5",
-                    "optionD": "6",
-                    "marks": 5
-                },
-                {
-                    "questionId": 1003,
-                    "questionText": "What is 5 + 5?",
-                    "optionA": "8",
-                    "optionB": "9",
-                    "optionC": "10",
-                    "optionD": "11",
-                    "marks": 5
-                }
-            ],
-            "response": {
-                "success": 1,
-                "message": "Test started successfully."
-            }
-        }
-
-        function renderQuestions(questions) {
+    function renderQuestions(questions) {
 
 
             questions.map((q, ind) => {
@@ -217,6 +173,41 @@
             })
         }
 
+    function formatTestTime(StartDateTime, EndDateTime) {
+
+        const start = parseInt(StartDateTime.match(/\d+/)[0]);
+        const end = parseInt(EndDateTime.match(/\d+/)[0]);
+
+        const duration = (end - start) / 1000; // seconds
+
+        return Math.floor(duration);
+    }
+
+    function renderTimer(totalSeconds) {
+
+        var intervalID = setInterval(function () {
+
+            const hours = Math.floor(totalSeconds / 3600);
+            const minutes = Math.floor((totalSeconds % 3600) / 60);
+            const seconds = totalSeconds % 60;
+
+            const formatted =
+                (hours > 0 ? (hours < 10 ? "0" : "") + hours + ":" : "") +
+                (minutes < 10 ? "0" : "") + minutes + ":" +
+                (seconds < 10 ? "0" : "") + seconds;
+
+            $("#timerDisplay").text(formatted);
+
+            totalSeconds--;
+
+            if (totalSeconds < 0) {
+                clearInterval(intervalID);
+                $("#timerDisplay").text("Time Up!");
+            }
+
+        }, 1000);
+    }
+
         $(document).ready(function () {
 
             const testID = localStorage.getItem("selectedTestId");
@@ -236,15 +227,26 @@
                         console.log("Response: ", response)
                         console.log("Questions: ",response.Questions)
                         renderQuestions(response.Questions)
+                        const totalSeconds = formatTestTime(response.Test.StartDateTime, response.Test.EndDateTime);
+
+                        //IF test duration is < 2hr then only it will be a timed test
+                        // Student can submit using button or gets auto submit once timer stops
+                        if (totalSeconds < 7200) { 
+                            renderTimer(totalSeconds);
+                            //Implement submit logic here!!
+                        }
+                        else {
+                            console.log("Test duration is more than 2hr")
+                            $("#timerDisplay").text("No Time Limit")
+                            $("#timeRemainingHeader").addClass("d-none")
+                            // Implement submit logic here!!
+                        }
                     }
-                    //renderQuestions(response);
                 },
                 error: function (response) {
                     console.log("Error response: ", response);
                 }
             })
-
-            //renderQuestions(dummyResponse.questions)
 
         })
 </script>
