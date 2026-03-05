@@ -1,4 +1,12 @@
-CREATE OR ALTER PROC sp_StartTest
+USE [PrepMasterDB]
+GO
+
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+
+ALTER PROC [dbo].[sp_StartTest]
 (
     @TestID INT,
     @StudentId INT
@@ -9,11 +17,45 @@ BEGIN
 
     BEGIN TRY
 
-        DECLARE @CurrentTime DATETIME = GETDATE();
+        DECLARE 
+            @CurrentTime DATETIME = SYSDATETIME(),
+            @TargetClassId INT,
+            @StartDateTime DATETIME,
+            @EndDateTime DATETIME,
+            @IsActive BIT;
+       
+        -- Fetch Test Once 
+        SELECT 
+            @TargetClassId = TargetClassId,
+            @StartDateTime = StartDateTime,
+            @EndDateTime = EndDateTime,
+            @IsActive = IsActive
+        FROM dbo.Tests
+        WHERE TestId = @TestID;
 
-        -- Validation Section
+        -- Validate Test Exists       
+        IF @TargetClassId IS NULL
+        BEGIN
+            EXEC dbo.sp_ReturnStartTestFailure 'Test does not exist.';
+            RETURN;
+        END
       
-        -- Student Exists
+        -- Validate Test Active
+        IF @IsActive = 0
+        BEGIN
+            EXEC dbo.sp_ReturnStartTestFailure 'Test is not active.';
+            RETURN;
+        END
+        
+        -- Validate Time Window
+		IF NOT (@CurrentTime BETWEEN @StartDateTime AND @EndDateTime)
+		BEGIN
+			EXEC dbo.sp_ReturnStartTestFailure 
+				'Test cannot be started before the start time or after the end time.';
+			RETURN;
+		END
+      
+        -- Validate Student Exists     
         IF NOT EXISTS (
             SELECT 1
             FROM dbo.Users
@@ -21,45 +63,24 @@ BEGIN
               AND Role = 'Student'
         )
         BEGIN
-            GOTO ValidationFailed;
+            EXEC dbo.sp_ReturnStartTestFailure 'Student not found.';
+            RETURN;
         END
-
-        -- Student Belongs To Target Class
+       
+        -- Validate Student Belongs To Target Class        
         IF NOT EXISTS (
             SELECT 1
-            FROM dbo.Users u
-            INNER JOIN dbo.Tests t
-                ON t.TestId = @TestID
-            WHERE u.UserId = @StudentId
-              AND u.StudentClassId = t.TargetClassId
+            FROM dbo.Users
+            WHERE UserId = @StudentId
+              AND StudentClassId = @TargetClassId
         )
         BEGIN
-            GOTO ValidationFailed;
+            EXEC dbo.sp_ReturnStartTestFailure 
+                'Student does not belong to the target class for this test.';
+            RETURN;
         END
-
-        -- Test Exists & Active
-        IF NOT EXISTS (
-            SELECT 1
-            FROM dbo.Tests
-            WHERE TestId = @TestID
-              AND IsActive = 1
-        )
-        BEGIN
-            GOTO ValidationFailed;
-        END
-
-        -- Time Window Check 
-        IF NOT EXISTS (
-            SELECT 1
-            FROM dbo.Tests
-            WHERE TestId = @TestID
-              --AND @CurrentTime BETWEEN StartDateTime AND EndDateTime
-        )
-        BEGIN
-            GOTO ValidationFailed;
-        END
-
-        -- Prevent Re-attempt
+     
+        -- Prevent Re-attempt        
         IF EXISTS (
             SELECT 1
             FROM dbo.TestResults
@@ -67,10 +88,13 @@ BEGIN
               AND StudentId = @StudentId
         )
         BEGIN
-            GOTO ValidationFailed;
+            EXEC dbo.sp_ReturnStartTestFailure 
+                'This test can only be attempted once.';
+            RETURN;
         END
 
-        -- SUCCESS 
+        -- SUCCESS FLOW
+
         -- Result Set 1: Test Info
         SELECT
             t.TestId,
@@ -95,65 +119,14 @@ BEGIN
         WHERE q.TestId = @TestID;
 
         -- Result Set 3: Response
-        SELECT 1 AS Success,
-               'Test started successfully.' AS Message;
-
-        RETURN;
-
-        -- FAILURE FLOW (Always Return 3 Result Sets)
-        ValidationFailed:
-
-        -- Empty Test
         SELECT 
-            NULL AS TestId,
-            NULL AS Title,
-            NULL AS Description,
-            NULL AS StartDateTime,
-            NULL AS EndDateTime,
-            NULL AS TotalMarks
-        WHERE 1 = 0;
-
-        -- Empty Questions
-        SELECT 
-            NULL AS QuestionId,
-            NULL AS QuestionText,
-            NULL AS OptionA,
-            NULL AS OptionB,
-            NULL AS OptionC,
-            NULL AS OptionD,
-            NULL AS Marks
-        WHERE 1 = 0;
-
-        -- Failure Response
-        SELECT 0 AS Success,
-               'Test cannot be started.' AS Message;
+            1 AS Success,
+            'Test started successfully.' AS Message;
 
     END TRY
     BEGIN CATCH
-
-        -- Always return 3 result sets even on SQL error
-        SELECT 
-            NULL AS TestId,
-            NULL AS Title,
-            NULL AS Description,
-            NULL AS StartDateTime,
-            NULL AS EndDateTime,
-            NULL AS TotalMarks
-        WHERE 1 = 0;
-
-        SELECT 
-            NULL AS QuestionId,
-            NULL AS QuestionText,
-            NULL AS OptionA,
-            NULL AS OptionB,
-            NULL AS OptionC,
-            NULL AS OptionD,
-            NULL AS Marks
-        WHERE 1 = 0;
-
-        SELECT 0 AS Success,
-               ERROR_MESSAGE() AS Message;
-
+		DECLARE @ErrorMessage NVARCHAR(4000) = ERROR_MESSAGE();
+        EXEC dbo.sp_ReturnStartTestFailure @ErrorMessage;
     END CATCH
 END
 GO

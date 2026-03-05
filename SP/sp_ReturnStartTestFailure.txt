@@ -1,0 +1,33 @@
+CREATE OR ALTER PROC sp_ReturnStartTestFailure (
+	@Message NVARCHAR(MAX)
+)
+AS
+BEGIN
+	SET NOCOUNT ON; 
+	
+	-- Result Set 1: Empty Test
+    SELECT 
+        NULL AS TestId,
+        NULL AS Title,
+        NULL AS Description,
+        NULL AS StartDateTime,
+        NULL AS EndDateTime,
+        NULL AS TotalMarks
+    WHERE 1 = 0;
+
+    -- Result Set 2: Empty Questions
+    SELECT 
+        NULL AS QuestionId,
+        NULL AS QuestionText,
+        NULL AS OptionA,
+        NULL AS OptionB,
+        NULL AS OptionC,
+        NULL AS OptionD,
+        NULL AS Marks
+    WHERE 1 = 0;
+
+    -- Result Set 3: Failure Response
+    SELECT 
+        0 AS Success,
+        @Message AS Message;
+END
