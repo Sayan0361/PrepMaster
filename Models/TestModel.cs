@@ -68,6 +68,7 @@ namespace PrepMaster.Models
         public DateTime StartDateTime { get; set; }
         public DateTime EndDateTime { get; set; }
         public int TotalMarks { get; set; }
+        public string SubjectName { get; set; }
     }
     public class QuestionStartModel
     {

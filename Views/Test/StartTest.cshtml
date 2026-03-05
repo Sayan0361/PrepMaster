@@ -4,7 +4,15 @@
 
 }
 
+<style>
+    .cursor-pointer {
+        cursor: pointer !important;
+    }
+
+</style>
+
 @*@Html.Partial("_UnauthorizedAccess")*@
+
 
 <div class="container-fluid bg-light min-vh-100 py-3">
 
@@ -15,7 +23,7 @@
                 <strong>Exam Mode:</strong>
                 <span class="text-primary">Timer running. Answers are auto-saved locally.</span>
             </div>
-            <a href="#" class="text-danger text-decoration-none fw-semibold mt-1 mt-md-0">
+            <a class="text-danger text-decoration-none fw-semibold mt-1 mt-md-0 cursor-pointer" id="quitExam">
                 Quit Exam
             </a>
         </div>
@@ -30,13 +38,14 @@
                 <div class="row align-items-center">
 
                     <div class="col-lg-8">
-                        <span class="badge bg-primary px-2 py-1 mb-2 small">
-                            COMPUTER SCIENCE
+                        <span class="badge bg-primary px-2 py-1 mb-2 small" id="test-subject">
                         </span>
 
-                        <h5 class="fw-bold mb-0">
-                            Mid-Term SQL Assessment
+                        <h5 class="fw-bold mb-0" id="test-title">
                         </h5>
+
+                        <p class="text-secondary small mb-0" id="test-description">
+                        </p>
                     </div>
 
                     <div class="col-lg-4 text-lg-end mt-3 mt-lg-0">
@@ -208,10 +217,25 @@
         }, 1000);
     }
 
+    function renderTestData(test) {
+
+        $("#test-subject").text(test.SubjectName)
+        $("#test-title").text(test.Title)
+        $("#test-description").text(test.Description)
+
+    }
+
         $(document).ready(function () {
 
             const testID = localStorage.getItem("selectedTestId");
             const userID = localStorage.getItem("UserID");
+
+            // Access verification
+            @*verifyUserAccess({
+                verifyUrl: '@Url.Action("VerifyUser", "Auth")',
+                redirectUrl: '@Url.Action("Index", "Home")',
+                hideSelector: "#main-container"
+            });*@
 
             //ajax call to fetch all questions
             $.ajax({
@@ -225,13 +249,14 @@
                     if (response.Success) {
 
                         console.log("Response: ", response)
-                        console.log("Questions: ",response.Questions)
+                        console.log("Questions: ", response.Questions)
+                        renderTestData(response.Test)
                         renderQuestions(response.Questions)
                         const totalSeconds = formatTestTime(response.Test.StartDateTime, response.Test.EndDateTime);
 
                         //IF test duration is < 2hr then only it will be a timed test
                         // Student can submit using button or gets auto submit once timer stops
-                        if (totalSeconds < 7200) { 
+                        if (totalSeconds < 7200) {
                             renderTimer(totalSeconds);
                             //Implement submit logic here!!
                         }
@@ -246,6 +271,14 @@
                 error: function (response) {
                     console.log("Error response: ", response);
                 }
+            })
+
+            $("#quitExam").on("click", function () {
+
+                const userID = localStorage.getItem("UserID")
+                var baseUrl = '@Url.Action("Index", "Student", new { id = 0 })';
+                window.location.href = baseUrl.replace("0", userID);
+
             })
 
         })
