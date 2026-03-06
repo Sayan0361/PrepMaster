@@ -192,7 +192,7 @@
         return Math.floor(duration);
     }
 
-    function renderTimer(totalSeconds) {
+    function renderTimer(totalSeconds, testID, userID) {
 
         var intervalID = setInterval(function () {
 
@@ -212,6 +212,17 @@
             if (totalSeconds < 0) {
                 clearInterval(intervalID);
                 $("#timerDisplay").text("Time Up!");
+
+                Swal.fire({
+                    title: "Auto Submit",
+                    text: "Your test is auto submitted.",
+                    icon: "success",
+                    confirmButtonText: 'OK',
+                    confirmButtonColor: "#3085d6",
+                })
+                    .then(() => {
+                        submitTestData(testID, userID);
+                    })
             }
 
         }, 1000);
@@ -304,6 +315,9 @@
                         showCancelButton: false,
                         confirmButtonText: 'OK',
                         confirmButtonColor: "#3085d6",
+                    }).then(() => {
+                        var baseUrl = '@Url.Action("Index", "Student", new { id = 0 })';
+                        window.location.href = baseUrl.replace("0", userID);
                     })
                 }
             },
@@ -328,7 +342,7 @@
             });
             }
 
-            
+
 
             //ajax call to fetch all questions
             $.ajax({
@@ -352,7 +366,7 @@
                         //IF test duration is < 2hr then only it will be a timed test
                         // Student can submit using button or gets auto submit once timer stops
                         if (totalSeconds <= 7200) {
-                            renderTimer(totalSeconds);
+                            renderTimer(totalSeconds, testID, userID);
                             //Implement submit logic here!!
                         }
                         else {
@@ -372,7 +386,7 @@
                         })
                             .then(() => {
 
-                                var baseUrl = '@Url.Action("Index", "Student", new { id = 0 })';        
+                                var baseUrl = '@Url.Action("Index", "Student", new { id = 0 })';
                                 window.location.href = baseUrl.replace("0", userID);
                             })
                     }
@@ -394,6 +408,8 @@
                 })
                     .then(() => {
                         submitTestData(testID, userID);
+                        var baseUrl = '@Url.Action("Index", "Student", new { id = 0 })';
+                        window.location.href = baseUrl.replace("0", userID);
                     })
             })
 
