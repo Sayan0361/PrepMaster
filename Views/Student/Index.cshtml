@@ -147,7 +147,7 @@
             const ediff = end - now;
             const sdiff = start - now;
             
-            if (ediff < 0) {
+            if (ediff < 0 || sdiff > 0) {
                 $(this).find('.startTestBtn').prop('disabled', true);
             }
 

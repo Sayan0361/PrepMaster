@@ -227,6 +227,17 @@
 
         $(document).ready(function () {
 
+            const testID = localStorage.getItem("selectedTestId");
+            if (!testID) {
+                Swal.fire({
+                    icon: "error",
+                    title: "Imposter",
+                    text: "Unauthorized Access",
+                }).then(() => {
+                window.location.href = '@Url.Action("Index","Home")'
+            });
+            }
+
             //stop page realoading
             $(document).keydown(function (e) {
 
@@ -266,7 +277,7 @@
                 }
             });
 
-            const testID = localStorage.getItem("selectedTestId");
+
             const userID = localStorage.getItem("UserID");
 
             // Access verification
