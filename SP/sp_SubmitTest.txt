@@ -1,4 +1,11 @@
-CREATE OR ALTER PROC sp_SubmitTest
+USE [PrepMasterDB]
+GO
+/****** Object:  StoredProcedure [dbo].[sp_SubmitTest]    Script Date: 3/6/2026 9:18:32 AM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+ALTER   PROC [dbo].[sp_SubmitTest]
 (
     @TestID INT,
     @StudentId INT,
@@ -94,10 +101,10 @@ BEGIN
 
         SELECT 
             1 AS Success,
-            'Test submitted successfully.' AS Message,
-            @TotalMarks AS ScoreObtained,
-            @Percentage AS Percentage,
-            @Status AS ResultStatus;
+            'Test submitted successfully.' AS Message;
+            --@TotalMarks AS ScoreObtained,
+            --@Percentage AS Percentage,
+            --@Status AS ResultStatus;
 
     END TRY
     BEGIN CATCH

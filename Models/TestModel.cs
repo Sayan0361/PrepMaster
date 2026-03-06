@@ -49,7 +49,6 @@ namespace PrepMaster.Models
         public int IsActive { get; set; }
         public List<QuestionTableType> Questions { get; set; }
     }
-
     public class TeacherSpecializationModel
     {
         public int SpecId { get; set; }
@@ -85,6 +84,17 @@ namespace PrepMaster.Models
         public TestStartModel Test { get; set; }
         public List<QuestionStartModel> Questions { get; set; }
         public DbResponse Response { get; set; }
+    }
+    public class AnswerTableTypeModel
+    {
+        public int QuestionId { get; set; }
+        public char AttemptedOption { get; set; }
+    }
+    public class SubmitTestModel
+    {
+        public int TestID { get; set; }
+        public int StudentId { get; set; }
+        public List<AnswerTableTypeModel> Answers { get; set; }
     }
 }
 
@@ -220,6 +230,53 @@ namespace PrepMaster.DAL
             catch (SqlException)
             {
                 throw;
+            }
+        }
+        
+        public DbResponse SubmitTest(
+            int TestID, 
+            int StudentId,
+            List<AnswerTableTypeModel> Answers
+        )
+        {
+            try
+            {
+                var proc = "sp_SubmitTest";
+                DynamicParameters parameters = new DynamicParameters();
+                parameters.Add("@TestID", TestID);
+                parameters.Add("@StudentId", StudentId);
+
+                var table = new DataTable();
+                table.Columns.Add("QuestionId", typeof(int));
+                table.Columns.Add("AttemptedOption", typeof(char));
+                if (Answers != null) 
+                {
+                    foreach (var answer in Answers)
+                    {
+                        table.Rows.Add(
+                            answer.QuestionId,
+                            answer.AttemptedOption
+                        );
+                    }
+                }
+                if (Answers == null)
+                {
+                    Answers = new List<AnswerTableTypeModel>();
+                }
+                parameters.Add(
+                    "@Answers",
+                    table.AsTableValuedParameter("dbo.AnswerTableType")
+                );
+
+                return _conn.ExecuteSingleRow<DbResponse>(
+                    proc,
+                    parameters
+                );
+
+            }
+            catch(SqlException sqlex)
+            {
+                throw new Exception("Error submitting test", sqlex); 
             }
         }
     }
