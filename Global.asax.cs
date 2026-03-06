@@ -22,7 +22,9 @@ namespace PrepMaster
         protected void Application_Error()
         {
             Exception ex = Server.GetLastError();
+            var httpException = ex as HttpException;
 
+            int statusCode = httpException?.GetHttpCode() ?? 500;
             try
             {
                 var db = new DapperConn();
@@ -39,7 +41,14 @@ namespace PrepMaster
             }
 
             Server.ClearError();
-            Response.Redirect("~/Error");
+            if (statusCode == 404)
+            {
+                Response.Redirect("~/Error/NotFound");
+            }
+            else
+            {
+                Response.Redirect("~/Error");
+            }
         }
     }
 }
