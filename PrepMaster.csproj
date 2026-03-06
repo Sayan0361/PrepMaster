@@ -141,6 +141,7 @@
     <Compile Include="App_Start\FilterConfig.cs" />
     <Compile Include="App_Start\RouteConfig.cs" />
     <Compile Include="Controllers\AuthController.cs" />
+    <Compile Include="Controllers\ErrorController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\StudentController.cs" />
     <Compile Include="Controllers\TeacherController.cs" />
@@ -203,6 +204,7 @@
     <Content Include="SP\sp_GetTestsDetailsByStudentId.txt" />
     <Content Include="SP\sp_GetTestsDetailsByTeacherId.txt" />
     <Content Include="SP\sp_GetUserByEmail.txt" />
+    <Content Include="SP\sp_LogError.txt" />
     <Content Include="SP\sp_LogIn.txt" />
     <Content Include="SP\sp_ReturnStartTestFailure.txt" />
     <Content Include="SP\sp_SignUp.txt" />
@@ -232,6 +234,7 @@
     <Content Include="Views\Test\Create.cshtml" />
     <Content Include="SP\sp_SubmitTest.txt" />
     <Content Include="Views\Test\StartTest.cshtml" />
+    <Content Include="Views\Error\Index.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

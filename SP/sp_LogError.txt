@@ -1,0 +1,47 @@
+/****** Script for SelectTopNRows command from SSMS  ******/
+SELECT TOP (1000) [ErrorLogId]
+      ,[ErrorMessage]
+      ,[ErrorProcedure]
+      ,[ErrorLine]
+      ,[ErrorNumber]
+      ,[UserId]
+      ,[TestId]
+      ,[ErrorTime]
+      ,[StackTrace]
+  FROM [PrepMasterDB].[dbo].[ErrorLogs]
+
+CREATE PROCEDURE dbo.sp_LogError
+(
+    @ErrorMessage NVARCHAR(MAX),
+    @ErrorProcedure NVARCHAR(200) = NULL,
+    @ErrorLine INT = NULL,
+    @ErrorNumber INT = NULL,
+    @UserId INT = NULL,
+    @TestId INT = NULL,
+    @StackTrace NVARCHAR(MAX) = NULL
+)
+AS
+BEGIN
+	SET NOCOUNT ON;
+    INSERT INTO dbo.ErrorLogs
+    (
+        ErrorMessage,
+        ErrorProcedure,
+        ErrorLine,
+        ErrorNumber,
+        UserId,
+        TestId,
+        StackTrace
+    )
+    VALUES
+    (
+        @ErrorMessage,
+        @ErrorProcedure,
+        @ErrorLine,
+        @ErrorNumber,
+        @UserId,
+        @TestId,
+        @StackTrace
+    )
+
+END

@@ -1,10 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+using System.Data;
 using System.Web;
 using System.Web.Mvc;
 using System.Web.Optimization;
 using System.Web.Routing;
+using Dapper;
+using PrepMaster.Models;
 
 namespace PrepMaster
 {
@@ -16,6 +17,29 @@ namespace PrepMaster
             FilterConfig.RegisterGlobalFilters(GlobalFilters.Filters);
             RouteConfig.RegisterRoutes(RouteTable.Routes);
             BundleConfig.RegisterBundles(BundleTable.Bundles);
+        }
+
+        protected void Application_Error()
+        {
+            Exception ex = Server.GetLastError();
+
+            try
+            {
+                var db = new DapperConn();
+                var proc = "sp_LogError";
+                DynamicParameters param = new DynamicParameters();
+                param.Add("@ErrorMessage", ex.Message);
+                param.Add("@StackTrace", ex.StackTrace);
+                param.Add("@ErrorProcedure", HttpContext.Current.Request.Url.ToString());
+                db.ExecuteWithoutReturn(proc, param);
+            }
+            catch
+            {
+                // Prevent recursive crash if logging fails
+            }
+
+            Server.ClearError();
+            Response.Redirect("~/Error");
         }
     }
 }
