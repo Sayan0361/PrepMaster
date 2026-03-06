@@ -108,5 +108,49 @@ namespace PrepMaster.Controllers
                 Questions = result.Questions
             }, JsonRequestBehavior.AllowGet);
         }
+
+        [HttpPost]
+        public JsonResult SubmitTest(int TestID, int StudentId, List<AnswerTableTypeModel> Answers)
+        {
+
+            if (TestID == 0)
+            {
+                return Json(new
+                {
+                    Success = "false",
+                    Message = "TestID missing",
+                });
+            }
+
+            if (StudentId == 0)
+            {
+                return Json(new
+                {
+                    Success = "false",
+                    Message = "StudentID missing",
+                });
+            }
+
+            if(Answers == null && !Answers.Any())
+            {
+                return Json(new
+                {
+                    Success = "false",
+                    Message = "No Answers were attempted.",
+                });
+            }
+
+            var response = _dal.SubmitTest(
+                    TestID,
+                    StudentId,
+                    Answers
+                );
+
+            return Json(new
+            {
+                Success = response.Success == 1,
+                Message = response.Message
+            });
+        }
     }
 }
