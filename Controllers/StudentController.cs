@@ -21,5 +21,10 @@ namespace PrepMaster.Controllers
             List<TestModel> testList = _dal.GetTestsForStudent(id) ?? new List<TestModel>(); ;
             return View(testList);
         }
+
+        public ActionResult Results()
+        {
+            return View();
+        }
     }
 }

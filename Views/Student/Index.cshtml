@@ -168,7 +168,9 @@
                     var testId = card.data("id");
 
                     // Save to localStorage
-                    localStorage.setItem("selectedTestId", testId);
+                    //localStorage.setItem("selectedTestId", testId);
+
+                    sessionStorage.setItem("selectedTestId", testId);
 
                     console.log("Saved TestID:", testId);
 

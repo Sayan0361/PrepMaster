@@ -236,9 +236,21 @@
 
     }
 
-    function examProctor() {
-        //stop page realoading
-        $(document).keydown(function (e) {
+        $(document).ready(function () {
+
+            const testID = sessionStorage.getItem("selectedTestId");
+            if (!testID) {
+                Swal.fire({
+                    icon: "error",
+                    title: "Imposter",
+                    text: "Unauthorized Access",
+                }).then(() => {
+                window.location.href = '@Url.Action("Index","Home")'
+            });
+            }
+
+            //stop page realoading
+            $(document).keydown(function (e) {
 
             if (e.key === "F5" || (e.ctrlKey && e.key === "r")) {
                 e.preventDefault();
@@ -275,7 +287,7 @@
                 }
             }
         });
-    }
+    })
 
     function submitTestData(testID, userID) {
 
@@ -360,7 +372,7 @@
                         console.log("Questions: ", response.Questions)
                         renderTestData(response.Test)
                         renderQuestions(response.Questions)
-                        examProctor()
+                        //examProctor()
                         const totalSeconds = formatTestTime(response.Test.StartDateTime, response.Test.EndDateTime);
 
                         //IF test duration is < 2hr then only it will be a timed test
