@@ -115,7 +115,7 @@ namespace PrepMaster.DAL
                 DynamicParameters param = new DynamicParameters();
                 param.Add("@StudentId", StudentId);
 
-                var sp = "sp_GetAllTestsByStudentId";
+                var sp = "sp_GetTestsDetailsByStudentId";
                 return _conn.ExecuteMultipleRow<TestModel>(
                         sp, 
                         param

@@ -47,7 +47,7 @@ namespace PrepMaster
             }
             else
             {
-                Response.Redirect("~/Error");
+                Response.Redirect("~/Error/Index");
             }
         }
     }

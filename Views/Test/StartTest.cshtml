@@ -342,7 +342,7 @@
         $(document).ready(function () {
 
             const userID = localStorage.getItem("UserID");
-            const testID = localStorage.getItem("selectedTestId");
+            const testID = sessionStorage.getItem("selectedTestId");
 
             if (!testID) {
                 Swal.fire({

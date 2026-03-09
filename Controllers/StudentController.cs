@@ -18,7 +18,7 @@ namespace PrepMaster.Controllers
         // GET: Student/id
         public ActionResult Index(int id)
         {
-            List<TestModel> testList = _dal.GetTestsForStudent(id) ?? new List<TestModel>(); ;
+            List<TestModel> testList = _dal.GetTestsForStudent(id) ?? new List<TestModel>();
             return View(testList);
         }
 
