@@ -3,6 +3,7 @@
 @{
     ViewBag.Title = "Index";
 }
+
 @{
     var totalObtained = Model.Where(r => r.AttemptStatus == "Attempted").Sum(r => r.ScoreObtained);
     var totalFull = Model.Where(r => r.AttemptStatus == "Attempted").Sum(r => r.TotalMarks);
@@ -184,6 +185,12 @@
 
 <script>
 
+    function startExam() {
+        if (document.documentElement.requestFullscreen) {
+            document.documentElement.requestFullscreen();
+        }
+    }
+
     function renderTitle() {
         const activeTab = $(this).data("bs-target")
         const title = activeTab === "#available"
@@ -291,13 +298,24 @@
                     //localStorage.setItem("selectedTestId", testId);
 
                     sessionStorage.setItem("selectedTestId", testId);
+                    localStorage.setItem("StartTest", true);
 
                     console.log("Saved TestID:", testId);
+                     if (document.documentElement.requestFullscreen) {
+                        document.documentElement.requestFullscreen()
+                        .then(() => {
 
-                    // Optional: redirect to test page
-                    // window.location.href = "/Student/StartTest";
+                            console.log("Fullscreen failed:", err);
+                            window.location.href = '@Url.Action("StartTest", "Test")';
 
-                    window.location.href = '@Url.Action("StartTest", "Test")';
+                        })
+                        .catch(err => {
+
+                            console.log("Fullscreen failed:", err);
+                            window.location.href = '@Url.Action("StartTest", "Test")';
+
+                        });
+                    }
                 }
             });
 

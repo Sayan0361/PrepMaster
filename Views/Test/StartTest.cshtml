@@ -8,10 +8,18 @@
     .cursor-pointer {
         cursor: pointer !important;
     }
-
 </style>
 
 @*@Html.Partial("_UnauthorizedAccess")*@
+
+<div id="fullscreenPrompt" class="text-center p-5">
+    <h4>Exam Security</h4>
+    <p>This exam must run in fullscreen mode.</p>
+
+    <button class="btn btn-primary" id="enterFullscreen">
+        Enter Fullscreen & Start Exam
+    </button>
+</div>
 
 
 <div class="container-fluid bg-light min-vh-100 py-3">
@@ -24,8 +32,8 @@
                 <span class="text-primary">Timer running. Answers are auto-saved locally.</span>
             </div>
             @*<a class="text-danger text-decoration-none fw-semibold mt-1 mt-md-0 cursor-pointer" id="quitExam">
-                Quit Exam
-            </a>*@
+                    Quit Exam
+                </a>*@
         </div>
     </div>
 
@@ -54,7 +62,7 @@
                                 Time Remaining
                             </div>
                             <div class="text-warning fw-bold fs-5" id="timerDisplay">
-                                
+
                             </div>
                         </div>
                     </div>
@@ -237,7 +245,7 @@
     }
 
         $(document).ready(function () {
-
+            
             const testID = sessionStorage.getItem("selectedTestId");
             if (!testID) {
                 Swal.fire({
@@ -248,6 +256,19 @@
                 window.location.href = '@Url.Action("Index","Home")'
             });
             }
+
+            // Enter Full Screen
+            $("#enterFullscreen").on("click", function () {
+                if (document.documentElement.requestFullscreen) {
+                    document.documentElement.requestFullscreen()
+                        .then(() => {
+                            $("#fullscreenPrompt").hide();
+                        })
+                        .catch(err => {
+                            console.log("Fullscreen failed:", err);
+                        });
+                }
+            });
 
             //stop page realoading
             $(document).keydown(function (e) {
@@ -339,10 +360,18 @@
         })
     }
 
+    function startExam() {
+        if (document.documentElement.requestFullscreen) {
+            document.documentElement.requestFullscreen();
+        }
+    }
+
         $(document).ready(function () {
 
             const userID = localStorage.getItem("UserID");
             const testID = sessionStorage.getItem("selectedTestId");
+
+            //startExam()
 
             if (!testID) {
                 Swal.fire({
