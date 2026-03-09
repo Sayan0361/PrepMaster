@@ -4,18 +4,16 @@
     ViewBag.Title = "Index";
 }
 @{
-    var totalObtained = Model.Sum(r => r.ScoreObtained);
-    var totalFull = Model.Sum(r => r.TotalMarks);
-    var overallAverage = totalFull > 0 ? (totalObtained * 100.0 / totalFull) : 0;
+    var totalObtained = Model.Where(r => r.AttemptStatus == "Attempted").Sum(r => r.ScoreObtained);
+    var totalFull = Model.Where(r => r.AttemptStatus == "Attempted").Sum(r => r.TotalMarks);
+    var overallAverage = Math.Floor(totalFull > 0 ? (totalObtained * 100.0 / totalFull) : 0);
     var highestMarkSub = Model
-                .Where(r => r.AttemptStatus == "Attempted")
-                .OrderByDescending(r => r.ScoreObtained)
-                .FirstOrDefault()
-                .SubjectName;
+        .Where(r => r.AttemptStatus == "Attempted")
+        .OrderByDescending(r => r.ScoreObtained)
+        .FirstOrDefault()
+        .SubjectName;
     var testPassed = Model.Where(r => r.ResultStatus == "Pass").Count();
 }
-
-
 
 @Html.Partial("_Navbar")
 @Html.Partial("_UnauthorizedAccess")
@@ -157,6 +155,7 @@
                             <th scope="col">Subject</th>
                             <th scope="col">Assessment Title</th>
                             <th scope="col">Score</th>
+                            <th scope="col">Out of</th>
                             <th scope="col">Status</th>
                         </tr>
                     </thead>
@@ -170,6 +169,7 @@
                                     <td>@res.SubjectName</td>
                                     <td>@res.Title</td>
                                     <td>@res.ScoreObtained</td>
+                                    <td>@res.TotalMarks</td>
                                     <td>@res.ResultStatus</td>
                                 </tr>
                             }

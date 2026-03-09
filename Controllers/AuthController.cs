@@ -120,7 +120,7 @@ namespace PrepMaster.Controllers
                          {
                              success = true,
                              StatusCode = 200,
-                             Message = "User logged In suceesfully",
+                             Message = "User logged In successfully",
                              Data = new { id = user.UserId, UserName = user.FullName, HashKey },
                              Error = "",
                          }
