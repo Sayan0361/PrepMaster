@@ -45,10 +45,10 @@ namespace PrepMaster
             {
                 Response.Redirect("~/Error/NotFound");
             }
-            else
-            {
-                Response.Redirect("~/Error/Index");
-            }
+            //else
+            //{
+            //    Response.Redirect("~/Error/Index");
+            //}
         }
     }
 }

@@ -7,19 +7,19 @@
 @{
     var totalObtained = Model
                 .Where(r => r.AttemptStatus == "Attempted")
-                .Sum(r => r.ScoreObtained);
+                ?.Sum(r => r.ScoreObtained) ?? 0;
 
     var totalFull = Model
                 .Where(r => r.AttemptStatus == "Attempted")
-                .Sum(r => r.TotalMarks);
+                ?.Sum(r => r.TotalMarks) ?? 0;
 
     var averagePercentage = Math.Floor(totalFull > 0 ? (totalObtained * 100.0 / totalFull) : 0);
 
     var highestMarkSub = Model
                 .Where(r => r.AttemptStatus == "Attempted")
-                .OrderByDescending(r => r.ScoreObtained)
-                .FirstOrDefault()
-                .SubjectName;
+                ?.OrderByDescending(r => r.ScoreObtained)
+                ?.FirstOrDefault()
+                ?.SubjectName ?? "------";
 
     var testPassed = Model.Where(r => r.ResultStatus == "Pass").Count();
 }
