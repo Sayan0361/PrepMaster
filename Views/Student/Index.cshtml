@@ -246,8 +246,8 @@
 
     function renderStatusBadge() {
         $(".status").each(function () {
-            const status = $('#test-status').innerText()
-            $(this).removeClass()
+            const status = $('#test-status').text().trim()
+            $(this).removeClass("status-active status-closed")
             if (status == 'Pass') {
                 $(this).addClass('status-active');
             }
@@ -348,20 +348,14 @@
                     localStorage.setItem("StartTest", true);
 
                     console.log("Saved TestID:", testId);
-                     if (document.documentElement.requestFullscreen) {
-                        document.documentElement.requestFullscreen()
-                        .then(() => {
+                     if (result.isConfirmed) {
+                            var card = $(this).closest(".test-card");
+                            var testId = card.data("id");
 
-                            console.log("Fullscreen failed:", err);
+                            sessionStorage.setItem("selectedTestId", testId);
+                            localStorage.setItem("StartTest", true);
+
                             window.location.href = '@Url.Action("StartTest", "Test")';
-
-                        })
-                        .catch(err => {
-
-                            console.log("Fullscreen failed:", err);
-                            window.location.href = '@Url.Action("StartTest", "Test")';
-
-                        });
                     }
                 }
             });
