@@ -13,7 +13,7 @@
 
 <div id="fullscreenPrompt" class="text-center p-5">
     <h4>Exam Security</h4>
-    <p>This exam must run in fullscreen mode.</p>
+    <p>This exam must run in fullscreen mode.Please don't open any tab or Menu'</p>
 
     <button class="btn btn-primary" id="enterFullscreen">
         Enter Fullscreen & Start Exam
@@ -420,11 +420,54 @@
                 cancelButtonColor: "#d33",
             })
             .then((result) => {
-                if(result.isConfirmed) {
+                if (result.isConfirmed) {
+                    const testID = sessionStorage.getItem("selectedTestId");
+                    const userID = localStorage.getItem("UserID");
                     submitTestData(testID, userID);
                 }
             })
         })
+
+        document.addEventListener('contextmenu', function (e) {
+            e.preventDefault();
+        });
+
+        document.addEventListener('keydown', function (e) {
+            if (e.key === 'F12' ||
+                (e.ctrlKey && e.shiftKey && ['I', 'i', 'J', 'j', 'C', 'c'].includes(e.key)) ||
+                (e.ctrlKey && ['U', 'u'].includes(e.key)) ||
+                (e.metaKey && e.altKey && ['I', 'i', 'J', 'j', 'C', 'c'].includes(e.key)) ||
+                (e.metaKey && ['U', 'u'].includes(e.key))) {
+                e.preventDefault();
+            }
+        });
+
+        window.addEventListener('blur', function () {
+            tabSwitchCount++;
+            console.log("Focus lost. Violation: " + tabSwitchCount);
+
+            if (tabSwitchCount >= 1) {
+                Swal.fire({
+                    title: "Violation Detected",
+                    text: "You opened another application or menu. Your test will be automatically submitted.",
+                    icon: "error",
+                    allowOutsideClick: false,
+                    showCancelButton: false,
+                    confirmButtonText: 'Submit Now',
+                    confirmButtonColor: "#d33",
+                }).then(() => {
+                    const testID = sessionStorage.getItem("selectedTestId");
+                    const userID = localStorage.getItem("UserID");
+                    submitTestData(testID, userID);
+                    window.location.href = '/PrepMaster/Student/Index/' + userID;
+                });
+            } else {
+                Swal.fire({
+                    text: "Warning: Focus lost. Please do not open other applications or notifications. Violation " + tabSwitchCount + "/3.",
+                    icon: "warning"
+                });
+            }
+        });
 
     });
 </script>
