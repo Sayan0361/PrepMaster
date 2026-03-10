@@ -107,14 +107,14 @@
 
         $('#signupBtn').on('click', function (e) {
             //e.preventDefault();
-            
+
             var FullName = $("#FullName").val().trim();
             var Email = $("#Email").val().trim();
             var Password = $("#Password").val().trim();
 
             // Find the role
             var selectedRoleValue = $('.nav-link.active').val();
-            
+
 
             $.ajax({
                 url: '@Url.Action("SignUp", "Auth")',
@@ -141,7 +141,7 @@
                             text: response.Message,
                             confirmButtonColor: '#5b5ce2'
                         }).then(() => {
-                            
+
                             localStorage.setItem('Role', selectedRoleValue);
                             localStorage.setItem('UserID', userId);
                             localStorage.setItem('Username', FullName);
@@ -154,7 +154,8 @@
 
                             } else {
 
-                                window.location.href = '@Url.Action("LogIn","Auth")';
+                                var baseUrl = '@Url.Action("Onboard","Student")';
+                                window.location.href = baseUrl + '/' + userId;
                             }
 
                         });

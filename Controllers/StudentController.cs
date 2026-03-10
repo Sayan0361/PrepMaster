@@ -35,7 +35,12 @@ namespace PrepMaster.Controllers
         public ActionResult Onboard(int id)
         {
             var availableSubjectsAndClasses = teacherDAL.GetSubjectsAndClasses();
-            return View(availableSubjectsAndClasses); 
+            var viewmodel = new StudentOnboardingVM
+            {
+                StudentId = id,
+                AvailableSubjects = availableSubjectsAndClasses
+            };
+            return View(viewmodel); 
         }
 
         [HttpPost]

@@ -36,8 +36,8 @@
 
 @{
     var groupedData = Model.AvailableSubjects
-                            .GroupBy(x => new { x.ClassId, x.ClassName })
-                            .OrderBy(g => g.Key.ClassName);
+                      .GroupBy(x => new { x.ClassId, x.ClassName })
+                      .OrderBy(g => g.Key.ClassId);
 }
 
 @foreach (var classGroup in groupedData)

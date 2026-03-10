@@ -1,0 +1,199 @@
+﻿@model PrepMaster.Models.StudentOnboardingVM
+
+@{
+    ViewBag.Title = "Student Onboarding";
+}
+
+@Html.Partial("_Navbar")
+
+<main class="d-flex justify-content-center align-items-center mt-5 pt-5"
+      style="min-height:90vh;">
+
+    <div class="card shadow-lg border-0 p-5"
+         style="max-width:850px;width:100%;border-radius:20px;">
+
+        <!-- Icon -->
+        <div class="text-center mb-4">
+
+            <div style="width:90px;height:90px;background:#e9ecf7;
+                        border-radius:50%;display:flex;
+                        align-items:center;justify-content:center;
+                        margin:auto;">
+                <i class="fas fa-user-graduate fa-2x text-primary"></i>
+            </div>
+
+            <h2 class="mt-4 fw-bold">Student Onboarding</h2>
+
+            <p class="text-muted">
+                Select your class to begin your learning journey.
+            </p>
+
+        </div>
+
+        <input type="hidden" id="studentId" value="@Model.StudentId" />
+
+        <div class="p-4 rounded"
+             style="background:#f8f9fb;border:1px solid #e5e7eb;">
+
+            <h5 class="fw-bold mb-4">Select Your Class</h5>
+
+            @{
+                
+               var groupedData = Model.AvailableSubjects
+                                    .GroupBy(x => new { x.ClassId, x.ClassName })
+                                    .OrderBy(g => g.Key.ClassId);
+               
+            }
+
+            @foreach (var classGroup in groupedData)
+            {
+                <div class="mb-4">
+
+                    <!-- Class -->
+                    <div class="form-check mb-2">
+
+                        <input class="form-check-input class-radio"
+                               type="radio"
+                               name="classSelection"
+                               value="@classGroup.Key.ClassId"
+                               id="class_@classGroup.Key.ClassId" />
+
+                        <label class="form-check-label fw-bold text-primary"
+                               for="class_@classGroup.Key.ClassId">
+
+                            @classGroup.Key.ClassName
+
+                        </label>
+
+                    </div>
+
+                    <!-- Subjects under class -->
+
+                    <ul class="ms-4 text-muted">
+
+                        @foreach (var subject in classGroup)
+                        {
+                            <li>@subject.SubjectName</li>
+                        }
+
+                    </ul>
+
+                </div>
+            }
+
+        </div>
+
+        <!-- Button -->
+
+        <div class="text-center mt-4">
+
+            <button id="btnSave"
+                    class="btn text-white px-5 py-3"
+                    style="background:linear-gradient(90deg,#5b5ce2,#4b3ccf);
+                           border-radius:12px;
+                           font-weight:600;
+                           font-size:16px;">
+
+                Complete Setup & Go to Dashboard
+
+            </button>
+
+        </div>
+
+    </div>
+
+</main>
+
+
+@section scripts {
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <script>
+
+$("#btnSave").click(function () {
+
+    var studentId = $("#studentId").val();
+
+    var selectedClass = $("input[name='classSelection']:checked").val();
+
+    if (!selectedClass) {
+
+        Swal.fire({
+            icon: 'warning',
+            title: 'No Class Selected',
+            text: 'Please select your class.',
+            confirmButtonColor: '#5b5ce2'
+        });
+
+        return;
+    }
+
+    $.ajax({
+
+        url: '@Url.Action("SaveOnboard","Student")',
+
+        type: 'POST',
+
+        data: {
+            UserId: studentId,
+            StudentClassId: selectedClass
+        },
+
+        beforeSend: function () {
+            $("#btnSave").prop("disabled", true);
+        },
+
+        success: function (response) {
+
+            if (response.Success) {
+
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Success',
+                    text: response.Message,
+                    confirmButtonColor: '#5b5ce2'
+                })
+                .then(() => {
+
+                    var baseUrl = '@Url.Action("Index","Student", new { id = 0 })';
+
+                    window.location.href = baseUrl.replace("0", studentId);
+
+                });
+
+            }
+            else {
+
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: response.Message,
+                    confirmButtonColor: '#dc3545'
+                });
+
+            }
+        },
+
+        error: function () {
+
+            Swal.fire({
+                icon: 'error',
+                title: 'Server Error',
+                text: 'Something went wrong. Please try again.',
+                confirmButtonColor: '#dc3545'
+            });
+
+        },
+
+        complete: function () {
+            $("#btnSave").prop("disabled", false);
+        }
+
+    });
+
+});
+
+    </script>
+
+}

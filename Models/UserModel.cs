@@ -1,6 +1,7 @@
 ﻿using Dapper;
 using PrepMaster.Models;
 using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Data.SqlClient;
 
@@ -29,6 +30,11 @@ namespace PrepMaster.Models
         public string Role { get; set; }
 
         public string HashKey { get; set; }
+    }
+    public class StudentOnboardingVM
+    {
+        public int StudentId { get; set; }
+        public List<GetSubjectsAndClassesVM> AvailableSubjects { get; set; }
     }
 }
 namespace PrepMaster.DAL
