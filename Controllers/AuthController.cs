@@ -1,4 +1,6 @@
-﻿using Dapper;
+﻿using BCrypt.Net;
+using Dapper;
+using PrepMaster.DAL;
 using PrepMaster.Models;
 using System;
 using System.Collections.Generic;
@@ -6,7 +8,6 @@ using System.Data.SqlClient;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
-using BCrypt.Net;
 
 
 namespace PrepMaster.Controllers
@@ -43,7 +44,7 @@ namespace PrepMaster.Controllers
             param.Add("PasswordHash", PasswordHash);
             param.Add("Role", Role);
 
-            UserModel md = new UserModel();
+            UserDAL md = new UserDAL();
             try
             {
                 int createdUserID = md.SignUp(param);
@@ -103,7 +104,7 @@ namespace PrepMaster.Controllers
             
             try
             {
-                UserModel md = new UserModel();
+                UserDAL md = new UserDAL();
                 UserModel user = md.LogIn(param);
 
                 string userHashedPassword = user.PasswordHash;

@@ -424,6 +424,7 @@
                     const testID = sessionStorage.getItem("selectedTestId");
                     const userID = localStorage.getItem("UserID");
                     submitTestData(testID, userID);
+                    window.location.href = '/PrepMaster/Student/Index/' + userID;
                 }
             })
         })
