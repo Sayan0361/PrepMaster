@@ -1,0 +1,60 @@
+CREATE OR ALTER PROC sp_StudentOnboarding
+(
+    @UserId INT,
+    @StudentClassId INT
+)
+AS
+BEGIN
+    SET NOCOUNT ON;
+    BEGIN TRY
+		-- User doesn't exist
+		IF NOT EXISTS (
+            SELECT 1 
+            FROM dbo.Users 
+            WHERE UserId = @UserId
+			AND Role = 'Student'
+        )
+        BEGIN
+            SELECT 
+                0 AS Success, 
+                'User doesnt exist' AS Message;
+            RETURN;
+        END
+
+        -- Class doesn't exist
+        IF NOT EXISTS (
+            SELECT 1 
+            FROM Classes 
+            WHERE ClassId = @StudentClassId
+        )
+        BEGIN
+            SELECT 
+                0 AS Success, 
+                'Invalid class selected' AS Message;
+            RETURN;
+        END
+
+        -- Save selected class
+        UPDATE dbo.Users
+        SET StudentClassId = @StudentClassId
+        WHERE UserId = @UserId;
+
+        -- Success response
+        SELECT 
+            1 AS Success,
+            'Student Onboarded successfully' AS Message;
+    END TRY
+
+    BEGIN CATCH
+
+		-- Error 
+        SELECT 
+            0 AS Success,
+            ERROR_MESSAGE() AS Message;
+    END CATCH
+
+END
+GO
+EXEC sp_StudentOnboarding 
+	@UserId = 1004,
+	@StudentClassId = 3;

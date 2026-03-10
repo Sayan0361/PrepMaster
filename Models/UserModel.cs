@@ -1,10 +1,8 @@
 ﻿using Dapper;
+using PrepMaster.Models;
 using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Data.SqlClient;
-using System.Linq;
-using System.Web;
 
 namespace PrepMaster.Models
 {
@@ -30,23 +28,37 @@ namespace PrepMaster.Models
         [Required(ErrorMessage = "Role is required")]
         public string Role { get; set; }
 
-        public string HashKey {  get; set; }
+        public string HashKey { get; set; }
+    }
+}
+namespace PrepMaster.DAL
+{
+    public class UserDAL
+    {
+        private readonly DapperConn _conn;
+
+        public UserDAL()
+        {
+            _conn = new DapperConn();
+        }
 
         public int SignUp(DynamicParameters param)
         {
-            try {
+            try
+            {
                 DapperConn conn = new DapperConn();
                 return conn.ExecuteSingle<int>("sp_SignUp", param);
                 //return 201;  // statuscode for successfully created
-            }catch(SqlException ex)
+            }
+            catch (SqlException ex)
             {
                 if (ex.Number == 50001)
                 {
-                    throw new Exception ("Email already Exist");
+                    throw new Exception("Email already Exist");
                 }
                 throw;
             }
-            
+
         }
 
         public UserModel LogIn(DynamicParameters param)
@@ -54,15 +66,32 @@ namespace PrepMaster.Models
             try
             {
                 DapperConn conn = new DapperConn();
-                UserModel user =  (conn.ExecuteSingleRow<UserModel>("sp_GetUserByEmail", param));
+                UserModel user = (conn.ExecuteSingleRow<UserModel>("sp_GetUserByEmail", param));
                 return user;
             }
-            catch(SqlException ex)
+            catch (SqlException ex)
             {
                 throw ex;
             }
         }
 
+        public DbResponse OnboardStudent(int userId, int studentClassId)
+        {
+            try
+            {
+                var param = new DynamicParameters();
+                param.Add("@UserId", userId);
+                param.Add("@StudentClassId", studentClassId);
+                var proc = "sp_StudentOnboarding";
+                return _conn.ExecuteSingleRow<DbResponse>(
+                    proc,
+                    param
+                );
+            }
+            catch (SqlException sqlex)
+            {
+                throw new Exception("Error in Onboarding the student : ", sqlex);
+            }
+        }
     }
 }
-    

@@ -15,7 +15,7 @@
     <AssemblyName>PrepMaster</AssemblyName>
     <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
     <MvcBuildViews>false</MvcBuildViews>
-    <UseIISExpress>true</UseIISExpress>
+    <UseIISExpress>false</UseIISExpress>
     <Use64BitIISExpress />
     <IISExpressSSLPort />
     <IISExpressAnonymousAuthentication />
@@ -209,6 +209,7 @@
     <Content Include="SP\sp_ReturnStartTestFailure.txt" />
     <Content Include="SP\sp_SignUp.txt" />
     <Content Include="SP\sp_StartTest.txt" />
+    <Content Include="SP\sp_StudentOnboarding.txt" />
     <Content Include="SP\Tables-Schema.txt" />
     <Content Include="SP\ViewTestForStudent.txt" />
     <Content Include="Web.config" />
