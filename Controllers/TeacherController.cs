@@ -13,9 +13,11 @@ namespace PrepMaster.Controllers
     public class TeacherController : Controller
     {
         private readonly TeacherDAL _dal;
+        private readonly TestDAL _Testdal;
         public TeacherController()
         {
             _dal = new TeacherDAL();
+            _Testdal = new TestDAL();
         }
         // GET: Teacher
         public ActionResult Index(int id)
@@ -80,7 +82,15 @@ namespace PrepMaster.Controllers
             });
         }
 
+        public ActionResult Analytics()
+        {
+            return View();
+        }
         
-        
+        public JsonResult AnalyticsData(int TeacherId)
+        {
+            var testDetails = _Testdal.GetTestResultByTeacherId(TeacherId);
+            return Json(new { testDetails }, JsonRequestBehavior.AllowGet);
+        }
     }
 }

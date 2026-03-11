@@ -201,6 +201,7 @@
     <Content Include="SP\sp_GetSubjectsAndClasses.txt" />
     <Content Include="SP\sp_getTeacherDashboardDetails.txt" />
     <Content Include="SP\sp_GetTeacherSpecialization.txt" />
+    <Content Include="SP\sp_GetTestAnalytics.txt" />
     <Content Include="SP\sp_GetTestsDetailsByStudentId.txt" />
     <Content Include="SP\sp_GetTestsDetailsByTeacherId.txt" />
     <Content Include="SP\sp_GetUserByEmail.txt" />
@@ -237,6 +238,7 @@
     <Content Include="Views\Test\StartTest.cshtml" />
     <Content Include="Views\Error\Index.cshtml" />
     <Content Include="Views\Error\NotFound.cshtml" />
+    <Content Include="Views\Teacher\Analytics.cshtml" />
     <Content Include="Views\Student\Onboard.cshtml" />
   </ItemGroup>
   <ItemGroup>

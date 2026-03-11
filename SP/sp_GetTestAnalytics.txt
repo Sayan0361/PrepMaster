@@ -1,0 +1,62 @@
+﻿CREATE OR ALTER PROC sp_GetTestAnalytics
+    @TeacherId INT
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    ----------------------------------------------------
+    -- 1. Tests Created By Teacher
+    ----------------------------------------------------
+    SELECT
+        t.TestId,
+        t.Title
+    FROM dbo.Tests t
+    WHERE t.CreatedByTeacherId = @TeacherId;
+
+
+    ----------------------------------------------------
+    -- 2. Student Wise Test Results
+    ----------------------------------------------------
+    SELECT
+        t.TestId,
+        t.Title,
+        t.TotalMarks,
+        u.UserId,
+        u.FullName,
+        tr.ScoreObtained,
+        tr.Status,
+        tr.SubmissionDate,
+        c.ClassId,
+        c.ClassName
+    FROM dbo.TestResults tr
+    JOIN dbo.Tests t
+        ON t.TestId = tr.TestId
+    JOIN dbo.Users u
+        ON tr.StudentId = u.UserId
+    JOIN dbo.Classes c
+        ON t.TargetClassId = c.ClassId
+    WHERE t.CreatedByTeacherId = @TeacherId;
+
+
+    ----------------------------------------------------
+    -- 3. Average Percentage Per Class
+    ----------------------------------------------------
+    SELECT 
+        c.ClassId,
+        c.ClassName,
+        AVG(tr.ScoreObtained * 100.0 / t.TotalMarks) AS AvgPercentage
+    FROM dbo.Tests t
+    INNER JOIN dbo.Classes c 
+        ON t.TargetClassId = c.ClassId
+    INNER JOIN dbo.TestResults tr 
+        ON tr.TestId = t.TestId
+    WHERE t.CreatedByTeacherId = @TeacherId
+    GROUP BY 
+        c.ClassId, 
+        c.ClassName;
+
+END
+GO
+
+exec sp_GetTestAnalytics
+	@TeacherId = 12;

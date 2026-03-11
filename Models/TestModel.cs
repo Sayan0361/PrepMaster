@@ -96,6 +96,42 @@ namespace PrepMaster.Models
         public int StudentId { get; set; }
         public List<AnswerTableTypeModel> Answers { get; set; }
     }
+
+    public class TestResultModel
+    {
+        public int TestId { get; set; }
+        public string Title { get; set; }
+        public int TotalMarks { get; set; }
+        public int UserId { get; set; }
+        public string FullName { get; set; }
+        public int ScoreObtained { get; set; }
+        public string Status { get; set; }
+        public DateTime SubmissionDate { get; set; }
+        public int ClassId { get; set; }
+        public string ClassName { get; set; }
+
+    }
+
+    public class TestAnalyticsModel
+    {
+        public int TestId { get; set; }
+        public string Title { get; set; }
+    }
+
+    public class ClassAverageModel
+    {
+        public int ClassId { get; set; }
+        public string ClassName { get; set; }
+        public double AvgPercentage { get; set; }
+    }
+
+    public class TeacherDashboardAnalyticsModel
+    {
+        public List<TestAnalyticsModel> Test { get; set; }
+        public List<TestResultModel> TestResult { get; set; }
+        public List<ClassAverageModel> ClassAverage { get; set; }
+    }
+
 }
 
 namespace PrepMaster.DAL
@@ -278,6 +314,32 @@ namespace PrepMaster.DAL
             catch(SqlException sqlex)
             {
                 throw new Exception("Error submitting test", sqlex); 
+            }
+        }
+
+        public TeacherDashboardAnalyticsModel GetTestResultByTeacherId(int TeacherId)
+        {
+            try
+            {
+                DynamicParameters param = new DynamicParameters();
+                param.Add("@TeacherId", TeacherId);
+
+                var sp = "sp_GetTestAnalytics";
+                
+                var result = _conn.ExecuteThreeLists<TestAnalyticsModel, TestResultModel, ClassAverageModel>(
+                    sp, param
+                );
+
+                return new TeacherDashboardAnalyticsModel
+                {
+                    Test = result.Item1,
+                    TestResult = result.Item2,
+                    ClassAverage = result.Item3
+                };
+            }
+            catch(SqlException ex)
+            {
+                throw ex;
             }
         }
     }

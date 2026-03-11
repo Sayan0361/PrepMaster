@@ -12,14 +12,14 @@ namespace PrepMaster.Models
     public class DapperConn
     {
         public readonly string connectionString = null;
-        public DapperConn() 
+        public DapperConn()
         {
-             connectionString = ConfigurationManager.ConnectionStrings["DB"].ConnectionString; 
+            connectionString = ConfigurationManager.ConnectionStrings["DB"].ConnectionString;
         }
         // RETURN NO VALUE.
         public void ExecuteWithoutReturn(string procName, DynamicParameters param = null)
         {
-            using(SqlConnection conn = new SqlConnection(this.connectionString))
+            using (SqlConnection conn = new SqlConnection(this.connectionString))
             {
                 conn.Open();
                 conn.Execute(procName, param, commandType: CommandType.StoredProcedure);
@@ -28,25 +28,25 @@ namespace PrepMaster.Models
         // RETURN SINGLE ROW.
         public T ExecuteSingleRow<T>(string procName, DynamicParameters param = null)
         {
-            using(SqlConnection conn = new SqlConnection(this.connectionString))
+            using (SqlConnection conn = new SqlConnection(this.connectionString))
             {
                 conn.Open();
-                return conn.QueryFirstOrDefault<T>(procName, param, commandType:CommandType.StoredProcedure);
+                return conn.QueryFirstOrDefault<T>(procName, param, commandType: CommandType.StoredProcedure);
             }
         }
         // RETURN MULTIPLE ROW AS LIST.
         public List<T> ExecuteMultipleRow<T>(string procName, DynamicParameters param)
         {
-            using(SqlConnection conn = new SqlConnection(this.connectionString))
+            using (SqlConnection conn = new SqlConnection(this.connectionString))
             {
                 conn.Open();
-                return conn.Query<T>(procName,param,commandType:CommandType.StoredProcedure).ToList();
+                return conn.Query<T>(procName, param, commandType: CommandType.StoredProcedure).ToList();
             }
         }
         // RETURN SINGLE VALUE LIKE ID, COUNT ETC.
         public T ExecuteSingle<T>(string procName, DynamicParameters param)
         {
-            using(SqlConnection conn = new SqlConnection(connectionString))
+            using (SqlConnection conn = new SqlConnection(connectionString))
             {
                 conn.Open();
                 return conn.ExecuteScalar<T>(procName, param, commandType: CommandType.StoredProcedure);
@@ -73,5 +73,23 @@ namespace PrepMaster.Models
             }
         }
 
+        public (List<T1>, List<T2>, List<T3>) ExecuteThreeLists<T1, T2, T3>(string procName,
+    DynamicParameters param)
+        {
+            using (SqlConnection conn = new SqlConnection(connectionString))
+            {
+                conn.Open();
+                using (var multi = conn.QueryMultiple(procName, param, commandType: CommandType.StoredProcedure))
+                {
+                    
+                    var Item1 = multi.Read<T1>().ToList();
+                    var Item2 = multi.Read<T2>().ToList();
+                    var Item3 = multi.Read<T3>().ToList();
+
+                    return (Item1, Item2, Item3);
+                }
+            }
+
+        }
     }
 }
