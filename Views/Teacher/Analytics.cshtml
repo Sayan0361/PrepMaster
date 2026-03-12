@@ -4,6 +4,7 @@
 }
 
 @Html.Partial("_Navbar")
+@Html.Partial("_UnauthorizedAccess")
 
 @*Page Header*@
 
@@ -110,7 +111,6 @@
                 </thead>
 
                 <tbody id="table-body">
-
                 </tbody>
 
             </table>
@@ -249,6 +249,17 @@
     $(document).ready(function () {
 
         const teacherID = localStorage.getItem("UserID")
+        var role = localStorage.getItem("Role");
+        if (teacherId == null || role != "Admin") {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Unauthorized Access!!',
+                text: 'You are not allowed to access this page!!',
+                confirmButtonColor: '#dc3545'
+            }).then(() => {
+                window.location.href = '@Url.Action("Index","Home")'
+            });
+        }
 
         $.ajax({
             url: '@Url.Action("AnalyticsData", "Teacher")',
@@ -265,7 +276,7 @@
                 // For Rendering Tests Options
                 renderTests(response.testDetails.Test)
 
-                
+
                 $('#classDropDown').change(function () {
                     updateResults(response.testDetails.TestResult, response.testDetails.ClassAverage);
                 });
