@@ -270,17 +270,27 @@
         })
     }
 
+    function redirectToDashboard(userID) {
+        console.log("UserID : ", userID)
+        if (!userID || userID == "null" || userID === "undefined") {
+            window.location.href = '/PrepMaster/Home/Index/';
+        } else {
+            window.location.href = '/PrepMaster/Student/Index/' + userID;
+        }
+    }
+
     $(document).ready(function () {
         const userID = localStorage.getItem("UserID");
+        debugger
+        console.log("UserID : ", typeof userID)
         const testID = sessionStorage.getItem("selectedTestId");
-
-        if (!testID) {
+        if (!userID || !testID ) {
             Swal.fire({
                 icon: "error",
                 title: "Imposter",
                 text: "Unauthorized Access",
             }).then(() => {
-                window.location.href = '@Url.Action("Index","Home")'
+                redirectToDashboard(userID);
             });
         }
 
