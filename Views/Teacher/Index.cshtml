@@ -1,204 +1,295 @@
-﻿@model PrepMaster.Models.TeacherDashboardVM
+﻿
 @{
-    ViewBag.Title = "Teacher Dashboard";
+    ViewBag.Title = "Index";
 }
 
 @Html.Partial("_Navbar")
 @Html.Partial("_UnauthorizedAccess")
 
-<style>
-    body {
-        background-color: #f8f9fa;
-    }
+@*Page Header*@
 
-    .stat-card {
-        background: #fff;
-        border-radius: 12px;
-        padding: 20px;
-        border: 1px solid #eee;
-        min-width: 220px;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.02);
-    }
-
-    .stat-label {
-        color: #6c757d;
-        font-weight: 600;
-        font-size: 0.85rem;
-        text-transform: uppercase;
-    }
-
-    .stat-value {
-        font-size: 2rem;
-        font-weight: 700;
-        color: #333;
-    }
-
-    .btn-create {
-        background-color: #5850ec;
-        color: white;
-        border-radius: 8px;
-        padding: 10px 20px;
-        font-weight: 600;
-    }
-
-        .btn-create:hover {
-            background-color: #453bc9;
-            color: white;
-        }
-
-    .status-badge {
-        padding: 4px 12px;
-        border-radius: 6px;
-        font-size: 0.85rem;
-        font-weight: 500;
-    }
-
-    .status-active {
-        background-color: #e1f7ed;
-        color: #20794d;
-        padding: 4px;
-        border: none;
-        border-radius: 15%;
-    }
-
-    .status-closed {
-        background-color: antiquewhite;
-        color: red;
-        padding: 4px;
-        border: none;
-        border-radius: 15%;
-    }
-
-    .status-upcoming {
-        background-color: aliceblue;
-        color: blue;
-        padding: 4px;
-        border: none;
-        border-radius: 15%;
-    }
-
-    .progress {
-        height: 8px;
-        width: 100px;
-        border-radius: 10px;
-    }
-
-    .table-container {
-        background: white;
-        border-radius: 12px;
-        padding: 25px;
-        border: 1px solid #eee;
-    }
-</style>
-
-<div class="container mt-5 pt-4" id="main-container">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <div>
-            <h1 class="fw-bold mb-0">Teacher Dashboard</h1>
-            <p class="text-muted">
-                Welcome back,
-                <strong>@Model.TeacherName</strong>
-            </p>
-        </div>
-        <button class="btn btn-primary" id="create-test-btn">+ Create New Test</button>
+<div class="d-flex justify-content-between align-items-end mb-5">
+    <div>
+        <h1 class="fw-bold">Test Analysis</h1>
+        <p>Prof. Stark Dashboard</p>
     </div>
-
-    <div class="row g-4 mb-5">
-        <div class="col-md-3">
-            <div class="stat-card">
-                <div class="stat-label">Active Tests</div>
-                <div class="stat-value">@Model.ActiveTests</div>
-            </div>
-        </div>
-        <div class="col-md-3">
-            <div class="stat-card">
-                <div class="stat-label">Upcoming Tests</div>
-                <div class="stat-value">@Model.UpcomingTests</div>
-            </div>
-        </div>
-        <div class="col-md-3">
-            <div class="stat-card">
-                <div class="stat-label">Total Students</div>
-                <div class="stat-value">@Model.TotalStudentsAssigned</div>
-            </div>
-        </div>
-    </div>
-
-    <div class="table-container">
-        <h5 class="fw-bold mb-4 text-center">Recent Test Performance</h5>
-        <div class="table-responsive">
-            <table class="table">
-                <thead class="text-muted">
-                    <tr class="text-center">
-                        <th>Test Title</th>
-                        <th>Class</th>
-                        <th>Status</th>
-                        <th class="">Total Marks</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @{
-                        foreach (var test in Model.Tests)
-                        {
-                            <tr>
-                                <td class="fw-bold text-center">@test.Title</td>
-                                <td class="text-center">@test.ClassName</td>
-                                <td class="text-center">
-                                    <span class="status-badge status-active status" id="test-status">@test.TestStatus</span>
-                                </td>
-                                <td class="text-center">
-                                    @*<div class="progress mb-1">
-                                            <div class="progress-bar bg-success" style="width: 75%"></div>
-                                        </div>*@
-                                    <small class="text-muted">@test.TotalMarks</small>
-
-                                </td>
-                                <td class="text-center">
-                                    <a href="#" class="text-primary text-decoration-none">View Details</a>
-                                </td>
-                            </tr>
-
-                        }
-                    }
-
-                </tbody>
-            </table>
-        </div>
+    <div>
+        <button class="btn btn-primary">+ Create New Test</button>
     </div>
 </div>
 
+@*Filter Section*@
+
+<div class="d-flex flex-column flex-md-row align-items-md-end gap-3 shadow p-4">
+
+    <div class="w-100 w-md-33">
+        <label class="form-label">
+            <i class="fa fa-solid fa-filter">
+            </i>
+            Filter By Class
+        </label>
+        <select class="form-select w-100 fw-bold" id="classDropDown">
+            <option value="">Choose Class</option>
+        </select>
+    </div>
+
+    <div class="w-100 w-md-33">
+        <label class="form-label">
+            <i class="fa-solid fa-file-lines"></i>
+            Select Assessment Test
+        </label>
+        <select class="form-select w-100 fw-bold" id="testDropDown">
+            <option value="">Select Assessment</option>
+        </select>
+    </div>
+
+</div>
+
+@* Analytics + Results Section *@
+
+<div class="row mt-4 g-4">
+
+    <!-- LEFT PORTION -->
+    <div class="col-lg-4">
+
+        <!-- Stats -->
+        <div class="row g-3 mb-3">
+
+            <div class="col-6">
+                <div class="p-3 shadow rounded text-center">
+                    <p class="text-muted small mb-1">TEST AVERAGE</p>
+                    <h2 class="fw-bold text-primary" id="testAvgText"></h2>
+                </div>
+            </div>
+
+            <div class="col-6">
+                <div class="p-3 shadow rounded text-center">
+                    <p class="text-muted small mb-1">TOTAL SUBMISSIONS</p>
+                    <h2 class="fw-bold" id="testCount"></h2>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Score Distribution -->
+        <div class="p-4 shadow rounded text-center">
+            <h5 class="fw-bold mb-3">Score Distribution</h5>
+            <p class="text-muted small">Rendered via HTML5 Canvas</p>
+
+            <!-- Chart Placeholder -->
+            <div style="height:250px">
+                <canvas id="scoreChart"></canvas>
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- RIGHT PORTION -->
+    <div class="col-lg-8">
+
+        <div class="shadow rounded p-4">
+
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h4 class="fw-bold mb-0">Student Results List</h4>
+                <span class="badge bg-primary-subtle text-primary" id="result-container-title">
+                    @*Grade 9: Basic Algebra Quiz*@
+                </span>
+            </div>
+
+            <table class="table align-middle">
+
+                <thead class="text-muted small">
+                    <tr>
+                        <th>STUDENT</th>
+                        <th>SUBMITTED AT</th>
+                        <th>SCORE</th>
+                        <th>FULL SCORE</th>
+                        <th>STATUS</th>
+                    </tr>
+                </thead>
+
+                <tbody id="table-body">
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+
+</div>
+
+
 <script>
+
+    function renderClassOptions(testResult) {
+
+        const classOptions = [
+            ...new Map(
+                testResult.map(t => [t.ClassId, t.ClassName]) //spreads into array and convert to map
+            )
+        ].map(([ClassId, ClassName]) => ({ ClassId, ClassName })) // creates pair
+
+        console.log(classOptions)
+
+        classOptions.forEach(c => {
+            const optionHtml = `
+                <option value="${c.ClassId}" class="classOptions">${c.ClassName}</option>
+            `
+
+            $('#classDropDown').append(optionHtml);
+        })
+
+    }
+
+    function renderTests(tests) {
+
+        tests.forEach(t => {
+            const optionHtml = `
+                <option value="${t.TestId}">${t.Title}</option>
+            `
+            $('#testDropDown').append(optionHtml);
+        })
+    }
+
+    function formatDateTime(submissionDate) {
+        const formattedSubmissionDate = new Date(parseInt(submissionDate.match(/\d+/)[0]))
+
+        const date = formattedSubmissionDate.getDate()
+        const month = formattedSubmissionDate.toLocaleString('default', { month: 'long' })
+        const year = formattedSubmissionDate.getFullYear()
+
+        const formattedDate = date + " " + month + " " + year;
+        return formattedDate;
+    }
+
+    function renderResultsList(testResult, classId, testId) {
+
+        //console.log(testResult)
+
+        const filteredList = testResult.filter(t =>
+            (!classId || t.ClassId == classId) &&
+            (!testId || t.TestId == testId)
+        )
+        $("#table-body").empty()
+
+
+       filteredList.forEach(res => {
+
+            const row = `
+                    <tr>
+                        <td>
+                            <strong>${res.FullName}</strong><br>
+                            <small class="text-muted">#${res.UserId}</small>
+                        </td>
+                        <td>${formatDateTime(res.SubmissionDate)}</td>
+                        <td class="fw-bold">${res.ScoreObtained}</td>
+                        <td class="fw-bold">${res.TotalMarks}</td>
+                        <td><span class="badge bg-success-subtle text-success">${res.Status}</span></td>
+                    </tr>
+            `
+           $("#table-body").append(row);
+           formatDateTime(res.SubmissionDate)
+        })
+
+        const testCount = filteredList.length;
+        $('#testCount').text(testCount)
+    }
+
+    function renderResultContainerTitle(testResult, classId, testId) {
+
+        const selectedClass = classId
+            ? testResult.find(t => t.ClassId == classId)?.ClassName
+            : null;
+
+        const selectedTest = testId
+            ? testResult.find(t => t.TestId == testId)?.Title
+            : null;
+
+        let title = "";
+
+        if (selectedClass && selectedTest) {
+            title = `${selectedClass}: ${selectedTest}`;
+        }
+        else if (selectedClass) {
+            title = selectedClass;
+        }
+        else if (selectedTest) {
+            title = selectedTest;
+        }
+
+        $("#result-container-title").text(title);
+
+    }
+
+    function renderTestAverage(classAverage, testId) {
+
+        const currentAvg = Math.floor(
+            classAverage
+                .find(c => c.TestId == testId)
+                ?.AvgPercentage || 0
+        );
+
+        $("#testAvgText").text(currentAvg);
+    }
+
+    function updateResults(testResult, classAverage) {
+        const classId = $('#classDropDown').val();
+        const testId = $('#testDropDown').val();
+
+        console.log(classId, testId);
+
+        renderResultsList(testResult, classId, testId);
+        renderResultContainerTitle(testResult, classId, testId);
+        renderTestAverage(classAverage, testId);
+    }
+
     $(document).ready(function () {
 
-        var userID = localStorage.getItem("UserID");
+        const teacherID = localStorage.getItem("UserID")
+        var role = localStorage.getItem("Role");
+        console.log(teacherID)
+        if (teacherID == null || role != "Admin") {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Unauthorized Access!!',
+                text: 'You are not allowed to access this page!!',
+                confirmButtonColor: '#dc3545'
+            }).then(() => {
+                window.location.href = '@Url.Action("Index","Home")'
+            });
+        }
+        console.log(teacherID)
 
-        verifyUserAccess({
-            verifyUrl: '@Url.Action("VerifyUser", "Auth")',
-            redirectUrl: '@Url.Action("Index", "Home")',
-            hideSelector: "#main-container"
-        });
+        $.ajax({
+            url: '@Url.Action("AnalyticsData", "Teacher")',
+            type: 'GET',
+            data: {
+                TeacherId: parseInt(teacherID)
+            },
+            success: function (response) {
+                console.log("S-Response: ", response)
+
+                // For Rendering Class Options
+                renderClassOptions(response.testDetails.TestResult)
+
+                // For Rendering Tests Options
+                renderTests(response.testDetails.Test)
 
 
-        $('.status').map(function () {
-            const status = $(this).text()
-            $(this).removeClass()
-            if (status == 'Upcoming') {
-                $(this).addClass('status-upcoming');
-            }
-            else if (status == 'Active') {
-                $(this).addClass('status-active');
-            }
-            else {
-                $(this).addClass('status-closed');
+                $('#classDropDown').change(function () {
+                    updateResults(response.testDetails.TestResult, response.testDetails.ClassAverage);
+                });
+
+                $('#testDropDown').change(function () {
+                    updateResults(response.testDetails.TestResult, response.testDetails.ClassAverage);
+                });
+            },
+            error: function (response) {
+                console.log("E-Response: ", response)
             }
         })
-
-        $('#create-test-btn').on('click', function () {
-
-            var baseUrl = '@Url.Action("Create", "Test", new { id = 0 })';
-            window.location.href = baseUrl.replace("0", userID);
-
-        })
-    });
+    })
 </script>
