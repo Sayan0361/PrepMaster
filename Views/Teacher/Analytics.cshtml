@@ -1,25 +1,23 @@
 ﻿
 @{
-    ViewBag.Title = "Index";
-    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewBag.Title = "Analytics";
 }
 
 @Html.Partial("_Navbar")
-@Html.Partial("_UnauthorizedAccess")
 
-@*Page Header*@
+<!--Page Header-->!>
 
 <div class="d-flex justify-content-between align-items-end mb-5">
     <div>
         <h1 class="fw-bold">Test Analysis</h1>
-        @*<p>Prof. Stark Dashboard</p>*@
+        <p>Prof. Stark Dashboard</p>
     </div>
     <div>
         <button class="btn btn-primary">+ Create New Test</button>
     </div>
 </div>
 
-@*Filter Section*@
+<!--Filter Section-->!>
 
 <div class="d-flex flex-column flex-md-row align-items-md-end gap-3 shadow p-4">
 
@@ -75,9 +73,10 @@
         <!-- Score Distribution -->
         <div class="p-4 shadow rounded text-center">
             <h5 class="fw-bold mb-3">Score Distribution</h5>
+            <p class="text-muted small">Rendered via HTML5 Canvas</p>
 
             <!-- Chart Placeholder -->
-            <div class="d-flex justify-content-center align-items-center" style="height:250px">
+            <div style="height:250px">
                 <canvas id="scoreChart"></canvas>
             </div>
 
@@ -123,52 +122,6 @@
 
 
 <script>
-    let scoreChart = null;
-
-    function renderChart(testResults) {
-
-
-        console.log(testResults)
-
-        const passResultCnt = testResults.filter(t =>
-            t.Status == "Pass"
-        ).length;
-
-        const totalCnt = testResults.length
-        const failResultCnt = totalCnt - passResultCnt;
-
-        console.table({ passResultCnt, totalCnt })
-
-        const data = {
-            labels: [
-                'Fail',
-                'Pass'
-            ],
-            datasets: [{
-                label: 'Performance',
-                data: [
-                    failResultCnt,
-                    passResultCnt
-                ],
-                backgroundColor: [
-                    'rgb(255, 99, 132)',
-                    'rgb(54, 162, 235)',
-                ],
-                hoverOffset: 4
-            }]
-        }
-
-        const ctx = $("#scoreChart")
-
-        if (scoreChart) {
-            scoreChart.destroy()
-        }
-
-        scoreChart = new Chart(ctx, {
-            type: 'doughnut',
-            data: data
-        })
-    }
 
     function renderClassOptions(testResult) {
 
@@ -220,8 +173,6 @@
             (!testId || t.TestId == testId)
         )
         $("#table-body").empty()
-
-        renderChart(filteredList)
 
 
        filteredList.forEach(res => {
@@ -280,7 +231,7 @@
                 ?.AvgPercentage || 0
         );
 
-        $("#testAvgText").text(currentAvg+"%");
+        $("#testAvgText").text(currentAvg);
     }
 
     function updateResults(testResult, classAverage) {
@@ -297,19 +248,6 @@
     $(document).ready(function () {
 
         const teacherID = localStorage.getItem("UserID")
-        var role = localStorage.getItem("Role");
-        console.log(teacherID)
-        if (teacherID == null || role != "Admin") {
-            Swal.fire({
-                icon: 'warning',
-                title: 'Unauthorized Access!!',
-                text: 'You are not allowed to access this page!!',
-                confirmButtonColor: '#dc3545'
-            }).then(() => {
-                window.location.href = '@Url.Action("Index","Home")'
-            });
-        }
-        console.log(teacherID)
 
         $.ajax({
             url: '@Url.Action("AnalyticsData", "Teacher")',
@@ -325,8 +263,6 @@
 
                 // For Rendering Tests Options
                 renderTests(response.testDetails.Test)
-
-                //renderChart(response.testDetails.TestResult)
 
 
                 $('#classDropDown').change(function () {
