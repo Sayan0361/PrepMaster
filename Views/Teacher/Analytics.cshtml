@@ -27,10 +27,8 @@
             </i>
             Filter By Class
         </label>
-        <select class="form-select w-100 fw-bold">
-            <option>Choose Class</option>
-            <option>Grade 9</option>
-            <option>Grade 10</option>
+        <select class="form-select w-100 fw-bold" id="classDropDown">
+            <option value="">Choose Class</option>
         </select>
     </div>
 
@@ -39,10 +37,8 @@
             <i class="fa-solid fa-file-lines"></i>
             Select Assessment Test
         </label>
-        <select class="form-select w-100 fw-bold">
-            <option>Select Assessment</option>
-            <option>SQL Test</option>
-            <option>Maths Test</option>
+        <select class="form-select w-100 fw-bold" id="testDropDown">
+            <option value="">Select Assessment</option>
         </select>
     </div>
 
@@ -61,14 +57,14 @@
             <div class="col-6">
                 <div class="p-3 shadow rounded text-center">
                     <p class="text-muted small mb-1">TEST AVERAGE</p>
-                    <h2 class="fw-bold text-primary">79%</h2>
+                    <h2 class="fw-bold text-primary" id="testAvgText"></h2>
                 </div>
             </div>
 
             <div class="col-6">
                 <div class="p-3 shadow rounded text-center">
                     <p class="text-muted small mb-1">TOTAL SUBMISSIONS</p>
-                    <h2 class="fw-bold">4</h2>
+                    <h2 class="fw-bold" id="testCount"></h2>
                 </div>
             </div>
 
@@ -96,8 +92,8 @@
 
             <div class="d-flex justify-content-between align-items-center mb-4">
                 <h4 class="fw-bold mb-0">Student Results List</h4>
-                <span class="badge bg-primary-subtle text-primary">
-                    Grade 9: Basic Algebra Quiz
+                <span class="badge bg-primary-subtle text-primary" id="result-container-title">
+                    @*Grade 9: Basic Algebra Quiz*@
                 </span>
             </div>
 
@@ -108,41 +104,12 @@
                         <th>STUDENT</th>
                         <th>SUBMITTED AT</th>
                         <th>SCORE</th>
+                        <th>FULL SCORE</th>
                         <th>STATUS</th>
                     </tr>
                 </thead>
 
-                <tbody>
-
-                    <tr>
-                        <td>
-                            <strong>Tom Holland</strong><br>
-                            <small class="text-muted">#9911</small>
-                        </td>
-                        <td>09:15 AM</td>
-                        <td class="fw-bold">82%</td>
-                        <td><span class="badge bg-success-subtle text-success">PASS</span></td>
-                    </tr>
-
-                    <tr>
-                        <td>
-                            <strong>Zendaya</strong><br>
-                            <small class="text-muted">#9912</small>
-                        </td>
-                        <td>09:20 AM</td>
-                        <td class="fw-bold">98%</td>
-                        <td><span class="badge bg-success-subtle text-success">PASS</span></td>
-                    </tr>
-
-                    <tr>
-                        <td>
-                            <strong>Jacob Batalon</strong><br>
-                            <small class="text-muted">#9913</small>
-                        </td>
-                        <td>09:25 AM</td>
-                        <td class="fw-bold text-danger">58%</td>
-                        <td><span class="badge bg-danger-subtle text-danger">FAIL</span></td>
-                    </tr>
+                <tbody id="table-body">
 
                 </tbody>
 
@@ -156,6 +123,129 @@
 
 
 <script>
+
+    function renderClassOptions(testResult) {
+
+        const classOptions = [
+            ...new Map(
+                testResult.map(t => [t.ClassId, t.ClassName]) //spreads into array and convert to map
+            )
+        ].map(([ClassId, ClassName]) => ({ ClassId, ClassName })) // creates pair
+
+        console.log(classOptions)
+
+        classOptions.forEach(c => {
+            const optionHtml = `
+                <option value="${c.ClassId}" class="classOptions">${c.ClassName}</option>
+            `
+
+            $('#classDropDown').append(optionHtml);
+        })
+
+    }
+
+    function renderTests(tests) {
+
+        tests.forEach(t => {
+            const optionHtml = `
+                <option value="${t.TestId}">${t.Title}</option>
+            `
+            $('#testDropDown').append(optionHtml);
+        })
+    }
+
+    function formatDateTime(submissionDate) {
+        const formattedSubmissionDate = new Date(parseInt(submissionDate.match(/\d+/)[0]))
+
+        const date = formattedSubmissionDate.getDate()
+        const month = formattedSubmissionDate.toLocaleString('default', { month: 'long' })
+        const year = formattedSubmissionDate.getFullYear()
+
+        const formattedDate = date + " " + month + " " + year;
+        return formattedDate;
+    }
+
+    function renderResultsList(testResult, classId, testId) {
+
+        //console.log(testResult)
+
+        const filteredList = testResult.filter(t =>
+            (!classId || t.ClassId == classId) &&
+            (!testId || t.TestId == testId)
+        )
+        $("#table-body").empty()
+
+
+       filteredList.forEach(res => {
+
+            const row = `
+                    <tr>
+                        <td>
+                            <strong>${res.FullName}</strong><br>
+                            <small class="text-muted">#${res.UserId}</small>
+                        </td>
+                        <td>${formatDateTime(res.SubmissionDate)}</td>
+                        <td class="fw-bold">${res.ScoreObtained}</td>
+                        <td class="fw-bold">${res.TotalMarks}</td>
+                        <td><span class="badge bg-success-subtle text-success">${res.Status}</span></td>
+                    </tr>
+            `
+           $("#table-body").append(row);
+           formatDateTime(res.SubmissionDate)
+        })
+
+        const testCount = filteredList.length;
+        $('#testCount').text(testCount)
+    }
+
+    function renderResultContainerTitle(testResult, classId, testId) {
+
+        const selectedClass = classId
+            ? testResult.find(t => t.ClassId == classId)?.ClassName
+            : null;
+
+        const selectedTest = testId
+            ? testResult.find(t => t.TestId == testId)?.Title
+            : null;
+
+        let title = "";
+
+        if (selectedClass && selectedTest) {
+            title = `${selectedClass}: ${selectedTest}`;
+        }
+        else if (selectedClass) {
+            title = selectedClass;
+        }
+        else if (selectedTest) {
+            title = selectedTest;
+        }
+
+        $("#result-container-title").text(title);
+
+    }
+
+    function renderTestAverage(classAverage, testId) {
+
+        const currentAvg = Math.floor(
+            classAverage
+                .find(c => c.TestId == testId)
+                ?.AvgPercentage || 0
+        );
+
+        $("#testAvgText").text(currentAvg);
+    }
+
+    function updateResults(testResult, classAverage) {
+        const classId = $('#classDropDown').val();
+        const testId = $('#testDropDown').val();
+
+        console.log(classId, testId);
+
+        renderResultsList(testResult, classId, testId);
+        renderResultContainerTitle(testResult, classId, testId);
+        renderTestAverage(classAverage, testId);
+    }
+
     $(document).ready(function () {
 
         const teacherID = localStorage.getItem("UserID")
@@ -168,6 +258,21 @@
             },
             success: function (response) {
                 console.log("S-Response: ", response)
+
+                // For Rendering Class Options
+                renderClassOptions(response.testDetails.TestResult)
+
+                // For Rendering Tests Options
+                renderTests(response.testDetails.Test)
+
+                
+                $('#classDropDown').change(function () {
+                    updateResults(response.testDetails.TestResult, response.testDetails.ClassAverage);
+                });
+
+                $('#testDropDown').change(function () {
+                    updateResults(response.testDetails.TestResult, response.testDetails.ClassAverage);
+                });
             },
             error: function (response) {
                 console.log("E-Response: ", response)

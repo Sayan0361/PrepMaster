@@ -120,8 +120,7 @@ namespace PrepMaster.Models
 
     public class ClassAverageModel
     {
-        public int ClassId { get; set; }
-        public string ClassName { get; set; }
+        public int TestId { get; set; }
         public double AvgPercentage { get; set; }
     }
 
