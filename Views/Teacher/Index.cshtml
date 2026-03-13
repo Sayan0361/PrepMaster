@@ -15,7 +15,7 @@
         @*<p>Prof. Stark Dashboard</p>*@
     </div>
     <div>
-        <button class="btn btn-primary">+ Create New Test</button>
+        <button class="btn btn-primary" id="createTestBtn">+ Create New Test</button>
     </div>
 </div>
 
@@ -340,6 +340,10 @@
             error: function (response) {
                 console.log("E-Response: ", response)
             }
+        })
+
+        $("#createTestBtn").click(function () {
+            window.location.href = '@Url.Action("Create","Test")'
         })
     })
 </script>

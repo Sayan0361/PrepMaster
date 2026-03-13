@@ -90,8 +90,8 @@
                         if (userId != null) {
                             // user is logged in
                             if (localStorage.getItem("Role") == "Admin") {
-                                var baseUrl = '@Url.Action("Index","Teacher", new { id = 0 })';
-                                window.location.href = baseUrl.replace("0", userId);
+                                var baseUrl = '@Url.Action("Index","Teacher")';
+                                window.location.href = baseUrl;
                             }
                             else {
                                 var baseUrl = '@Url.Action("Index","Student", new { id = 0 })';

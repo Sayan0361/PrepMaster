@@ -20,37 +20,9 @@ namespace PrepMaster.Controllers
             _Testdal = new TestDAL();
         }
         // GET: Teacher
-        public ActionResult Index(int id)
+        public ActionResult Index()
         {
-            TeacherDashboardVM model = new TeacherDashboardVM();
-            var testDetails = _dal.GetTestsDetailsByTeacherId(id);
-            var teacherDetails = _dal.GetTeacherDashboardDetails(id);
-
-            model.TeacherId = teacherDetails.TeacherId;
-            model.TeacherName = teacherDetails.TeacherName;
-            model.TotalTests = teacherDetails.TotalTests;
-            model.UpcomingTests = teacherDetails.UpcomingTests;
-            model.ActiveTests = teacherDetails.ActiveTests;
-            model.ExpiredTests  = teacherDetails.ExpiredTests;
-            model.TotalStudentsAssigned = teacherDetails.TotalStudentsAssigned;
-
-            model.Tests = testDetails;
-
-            //model.TestId = testDetails.TestId;
-            //model.Title = testDetails.Title;
-            //model.Description = testDetails.Description;   
-            //model.CreatedByTeacherId = testDetails.CreatedByTeacherId;
-            //model.FullName = testDetails.FullName;
-            //model.TargetClassId = testDetails.TargetClassId;
-            //model.ClassName = testDetails.ClassName;
-            //model.SubjectId = testDetails.SubjectId;
-            //model.SubjectName = testDetails.SubjectName;
-            //model.StartDateTime = testDetails.StartDateTime;
-            //model.EndDateTime = testDetails.EndDateTime;
-            //model.TotalMarks = testDetails.TotalMarks;
-            //model.TestStatus = testDetails.TestStatus;
-
-            return View(model);
+            return View();
         }
 
         // Onboard the Teacher : Teacher must fulfill the details

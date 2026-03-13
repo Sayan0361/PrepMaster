@@ -30,7 +30,7 @@ namespace PrepMaster.Controllers
             return Json(new { teacherSpecs }, JsonRequestBehavior.AllowGet);
         }
 
-        public ActionResult Create(int id)
+        public ActionResult Create()
         {
             //var teacherSpecsList = _dal.GetTeacherSpecs(id);
             //return View(teacherSpecsList);
