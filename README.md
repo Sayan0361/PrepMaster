@@ -40,7 +40,7 @@
 ### Database & Stored Procedures
 - **SQL Server Database** - Data persistence layer
 - **Stored Procedures** - Business logic automation
-  - User Authentication (LogIn, SignUp)
+  - Role-based User Authentication (LogIn, SignUp)
   - Test Management (CreateNewTest, GetAllQuestionsByTestID)
   - Student Features (StudentOnboarding, GetTestsDetailsByStudentId)
   - Teacher Features (GetTeacherDashboardDetails, GetTestAnalytics)
