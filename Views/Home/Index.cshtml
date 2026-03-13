@@ -6,21 +6,23 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
 
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+
     <style>
         body {
             background: white;
             min-height: 100vh;
         }
+
         .card-hover {
             transition: transform 0.3s ease, box-shadow 0.3s ease;
         }
 
-        .card-hover:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
-            cursor: pointer;
-        }
-
+            .card-hover:hover {
+                transform: translateY(-5px);
+                box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+                cursor: pointer;
+            }
     </style>
 </head>
 
@@ -28,84 +30,218 @@
 
     @Html.Partial("_Navbar")
 
-    <div class="container mt-5 pt-2" >
+    <div class="container mt-5 pt-2">
 
-        <h1 class="text-center text-primary fw-bold pt-5">
-            Master Exams with Confidence
-        </h1>
+        <!-- GUEST UI (NOT LOGGED IN) -->
+        <div id="guestUI" style="display:none;">
 
-        <h5 class="text-center mb-5 pb-5">
-            Specialized Platform for teachers and students
-        </h5>
+            <h1 class="text-center text-primary fw-bold pt-5">
+                Master Exams with Confidence
+            </h1>
 
-        <div class="row justify-content-center g-4">
+            <h5 class="text-center mb-5 pb-5">
+                Specialized Platform for teachers and students
+            </h5>
 
-            <div class="col-md-4">
-                <div class="card shadow text-center h-100 card-hover">
-                    <div class="card-body">
-                        <i class="bi bi-person-video3 fs-1"></i>
-                        <h5 class="card-title mt-3">Teacher Control</h5>
-                        <p class="card-text">
-                            Create specific tests for classes you teach based on your specialization.
-                        </p>
+            <div class="row justify-content-center g-4">
+
+                <div class="col-md-4">
+                    <div class="card shadow text-center h-100 card-hover">
+                        <div class="card-body">
+                            <i class="bi bi-person-video3 fs-1"></i>
+                            <h5 class="card-title mt-3">Teacher Control</h5>
+                            <p class="card-text">
+                                Teachers can create subject-specific tests for their students.
+                            </p>
+                        </div>
                     </div>
                 </div>
-            </div>
 
-            <div class="col-md-4">
-                <div class="card shadow text-center h-100 card-hover">
-                    <div class="card-body">
-                        <i class="bi bi-clock fs-1"></i>
-                        <h5 class="card-title mt-3"> Timed Assessments </h5>
-                        <p class="card-text">
-                            Secure, server-validated timers ensure fair testing for all students.
-                        </p>
+                <div class="col-md-4">
+                    <div class="card shadow text-center h-100 card-hover">
+                        <div class="card-body">
+                            <i class="bi bi-clock fs-1"></i>
+                            <h5 class="card-title mt-3">Timed Assessments</h5>
+                            <p class="card-text">
+                                Secure, server-validated timers ensure fair testing.
+                            </p>
+                        </div>
                     </div>
                 </div>
-            </div>
-            <div class="col-md-4">
-                <div class="card shadow text-center h-100 card-hover">
-                    <div class="card-body">
-                        <i class="bi bi-graph-up fs-1"></i>
-                        <h5 class="card-title mt-3">Instant Results </h5>
-                        <p class="card-text">
-                            Automated grading and performance tracking for immediate feedback.
-                        </p>
+
+                <div class="col-md-4">
+                    <div class="card shadow text-center h-100 card-hover">
+                        <div class="card-body">
+                            <i class="bi bi-graph-up fs-1"></i>
+                            <h5 class="card-title mt-3">Instant Results</h5>
+                            <p class="card-text">
+                                Automated grading with detailed performance analysis.
+                            </p>
+                        </div>
                     </div>
                 </div>
+
             </div>
 
         </div>
-        <div class=" text-center pt-4 ">
-            <button type="button" class="btn btn-outline-success btn-lg" id="getStarted" 
-                    data-bs-toggle="button" autocomplete="off">Get Started</button>
+
+
+        <!-- ADMIN UI -->
+        <div id="adminUI" style="display:none;">
+
+            <h1 class="text-center text-primary fw-bold pt-5">
+                Teacher Control Panel
+            </h1>
+
+            <h5 class="text-center mb-5 pb-5">
+                Manage tests and track student performance
+            </h5>
+
+            <div class="row justify-content-center g-4">
+
+                <div class="col-md-4">
+                    <div class="card shadow text-center h-100 card-hover">
+                        <div class="card-body">
+                            <i class="bi bi-journal-plus fs-1"></i>
+                            <h5 class="card-title mt-3">Create Tests</h5>
+                            <p>Create and assign tests for your students.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+                    <div class="card shadow text-center h-100 card-hover">
+                        <div class="card-body">
+                            <i class="bi bi-clock-history fs-1"></i>
+                            <h5 class="card-title mt-3">Timed Exams</h5>
+                            <p>Manage secure timed exams.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+                    <div class="card shadow text-center h-100 card-hover">
+                        <div class="card-body">
+                            <i class="bi bi-graph-up-arrow fs-1"></i>
+                            <h5 class="card-title mt-3">View Analytics</h5>
+                            <p>Analyze student performance and results.</p>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
         </div>
+
+
+        <!-- STUDENT UI -->
+        <div id="studentUI" style="display:none;">
+
+            <h1 class="text-center text-success fw-bold pt-5">
+                Prepare for Your Exams
+            </h1>
+
+            <h5 class="text-center mb-5 pb-5">
+                Attempt tests and track your progress
+            </h5>
+
+            <div class="row justify-content-center g-4">
+
+                <div class="col-md-4">
+                    <div class="card shadow text-center h-100 card-hover">
+                        <div class="card-body">
+                            <i class="bi bi-pencil-square fs-1"></i>
+                            <h5 class="card-title mt-3">Attempt Tests</h5>
+                            <p>Take exams assigned by your teachers.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+                    <div class="card shadow text-center h-100 card-hover">
+                        <div class="card-body">
+                            <i class="bi bi-bar-chart fs-1"></i>
+                            <h5 class="card-title mt-3">Track Scores</h5>
+                            <p>View your scores and exam history.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+                    <div class="card shadow text-center h-100 card-hover">
+                        <div class="card-body">
+                            <i class="bi bi-award fs-1"></i>
+                            <h5 class="card-title mt-3">Improve Performance</h5>
+                            <p>Analyze results and improve your exam performance.</p>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- BUTTON -->
+        <div class="text-center pt-4">
+            <button type="button" class="btn btn-outline-success btn-lg" id="getStarted">
+                Get Started
+            </button>
+        </div>
+
     </div>
+
+
     <script>
-        $(document).ready(function () {
 
-            var userId = localStorage.getItem("UserID");
-            $("#getStarted").on('click', function () {
-                console.log(userId);
-                        if (userId != null) {
-                            // user is logged in
-                            if (localStorage.getItem("Role") == "Admin") {
-                                var baseUrl = '@Url.Action("Index","Teacher")';
-                                window.location.href = baseUrl;
-                            }
-                            else {
-                                var baseUrl = '@Url.Action("Index","Student", new { id = 0 })';
-                                window.location.href = baseUrl.replace("0", userId);
-                            }
+$(document).ready(function () {
 
-                        }
-                        else {
-                            // user not logged in
-                            window.location.href = '/PrepMaster/Auth/Login';
-                        }
-                });
+    const userId = localStorage.getItem("UserID");
+    const role = localStorage.getItem("Role");
 
-            });
+    console.log("UserID:", userId);
+    console.log("Role:", role);
+
+    /* SHOW UI */
+
+    if (!userId) {
+        $("#guestUI").show();
+    }
+    else if (role === "Admin") {
+        $("#adminUI").show();
+    }
+    else if (role === "Student") {
+        $("#studentUI").show();
+    }
+
+
+    /* BUTTON CLICK */
+
+    $("#getStarted").click(function () {
+
+        if (!userId) {
+
+            window.location.href = "/PrepMaster/Auth/Login";
+
+        }
+        else if (role === "Admin") {
+
+            var url = '@Url.Action("Index","Teacher", new { id = 0 })';
+            window.location.href = url.replace("0", userId);
+
+        }
+        else if (role === "Student") {
+
+            var url = '@Url.Action("Index","Student", new { id = 0 })';
+            window.location.href = url.replace("0", userId);
+
+        }
+
+    });
+
+});
+
     </script>
+
 </body>
 </html>
