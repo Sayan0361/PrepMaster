@@ -5,6 +5,7 @@
 ![Razor](https://img.shields.io/badge/views-Razor%20HTML-512BD4?style=flat-square&logo=dotnet)
 ![ASP.NET MVC](https://img.shields.io/badge/framework-ASP.NET%20MVC%205-512BD4?style=flat-square&logo=dotnet)
 ![SQL Server](https://img.shields.io/badge/database-SQL%20Server-CC2927?style=flat-square&logo=microsoft-sql-server)
+[![.NET CI](https://github.com/soumyodipsays/PrepMaster/actions/workflows/dotnet.yml/badge.svg)](https://github.com/soumyodipsays/PrepMaster/actions/workflows/dotnet.yml)
 
 ## Overview
 
