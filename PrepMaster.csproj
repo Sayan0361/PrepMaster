@@ -239,6 +239,8 @@
     <Content Include="Views\Error\NotFound.cshtml" />
     <Content Include="Views\Teacher\Index.cshtml" />
     <Content Include="Views\Student\Onboard.cshtml" />
+    <Content Include="Scripts\models\face_expression_model-shard1" />
+    <Content Include="Scripts\models\age_gender_model-weights_manifest.json" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
