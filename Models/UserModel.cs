@@ -62,6 +62,10 @@ namespace PrepMaster.DAL
                 {
                     throw new Exception("Email already Exist");
                 }
+                if (ex.Number == 50002)
+                {
+                    throw new Exception("Email should be in the format of @gmail.com");
+                }
                 throw;
             }
 
